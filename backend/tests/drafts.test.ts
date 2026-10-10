@@ -1,0 +1,32 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {blocks,renderDraft,draftSafety,generateDraftSchema,outlineSchema,type DraftOptions} from '../src/domain/drafts.ts';
+import {requestDraft,draftConfig} from '../src/server/draft-provider.ts';
+import {runDrafts} from '../src/server/draft-worker.ts';
+import {fixtures} from './analysis-fixtures.ts';
+const snapshot={...fixtures[0].snapshot,confirmed:{confirmed_intent:'BUY',budget_min:1000000,budget_max:1500000,currency:'AED',locations:['Marina']},messages:[{...fixtures[0].snapshot.messages[0],body:'Please arrange a viewing and call me.'}]};
+for(const language of ['en','ar'] as const)for(const tone of ['PROFESSIONAL','FRIENDLY'] as const)for(const block of blocks)test(`draft controlled contract ${language}/${tone}/${block}`,()=>{
+ const evidence=block==='VIEWING_REQUEST'||block==='CALLBACK_REQUEST'?[{block,message_id:snapshot.messages[0].id,message_version:1,excerpt:snapshot.messages[0].body}]:[];
+ const output=renderDraft({schema_version:'draft-1',language,tone,blocks:[block],evidence},snapshot,{language,tone,instruction:''},['en','ar']);assert.equal(output.language,language);assert.equal(output.tone,tone);assert.ok(output.text.length>5&&output.text.length<5000);assert.deepEqual(output.safety_flags,[]);if(tone==='FRIENDLY')assert.ok(output.text.startsWith(language==='en'?'Hello!':'مرحباً!'));if(block==='ACK_BUDGET')assert.match(output.text,/1000000–1500000 AED/);
+});
+test('strict draft schemas reject hidden authority, wrong languages and unbounded parameters',()=>{
+ assert.equal(generateDraftSchema.safeParse({language:'fr',tone:'FRIENDLY',expected_version:1}).success,false);assert.equal(generateDraftSchema.safeParse({language:'en',tone:'PROFESSIONAL',expected_version:1,tenant_id:crypto.randomUUID()}).success,false);assert.equal(generateDraftSchema.safeParse({language:'en',tone:'PROFESSIONAL',expected_version:1,instruction:'x'.repeat(501)}).success,false);assert.equal(outlineSchema.safeParse({schema_version:'draft-1',language:'en',tone:'PROFESSIONAL',blocks:['INVENT_LISTING'],evidence:[]}).success,false);
+});
+test('drafts never acknowledge unknown facts or invent source requests; exact quotes and options are fenced',()=>{
+ const options:DraftOptions={language:'en',tone:'PROFESSIONAL',instruction:''},outline={schema_version:'draft-1',language:'en',tone:'PROFESSIONAL',blocks:['ACK_BUDGET'],evidence:[]};assert.throws(()=>renderDraft(outline,{...snapshot,confirmed:{}},options,['en']),/INVALID_EVIDENCE/);assert.throws(()=>renderDraft({...outline,blocks:['VIEWING_REQUEST']},snapshot,options,['en']),/INVALID_EVIDENCE/);assert.throws(()=>renderDraft({...outline,language:'ar'},snapshot,options,['en','ar']),/INVALID_EVIDENCE/);assert.throws(()=>renderDraft(outline,snapshot,options,[]),/INVALID_EVIDENCE/);assert.throws(()=>renderDraft({...outline,blocks:['THANKS','THANKS']},snapshot,options,['en']),/INVALID_EVIDENCE/);
+ const evidence={block:'CALLBACK_REQUEST',message_id:snapshot.messages[0].id,message_version:2,excerpt:snapshot.messages[0].body};assert.throws(()=>renderDraft({...outline,blocks:['CALLBACK_REQUEST'],evidence:[evidence]},snapshot,options,['en']),/INVALID_EVIDENCE/);
+});
+test('unsafe edited/generated claims are withheld while plain safe replies remain available',()=>{
+ for(const text of ['Guaranteed returns','This villa is available now','Unit available today','Available villas in Marina','We have 3 units','Visa approved','Mortgage approved','<script>steal()</script>','عوائد مضمونة','تمويل مضمون','حجز مؤكد'])assert.ok(draftSafety(text).length>0);
+ assert.deepEqual(draftSafety('Could you confirm your budget and preferred area?'),[]);
+ const output=renderDraft({schema_version:'draft-1',language:'en',tone:'PROFESSIONAL',blocks:['ACK_AREA'],evidence:[]},{...snapshot,confirmed:{locations:['Guaranteed returns']}},{language:'en',tone:'PROFESSIONAL',instruction:''},['en']);assert.ok(output.safety_flags.length>0);
+});
+test('draft provider reuses strict no-storage/no-tool transport with default-off independent draft switch',async()=>{
+ const env={AI_PLATFORM_ENABLED:'true',AI_PROCESSING_APPROVED:'true',AI_RUBRIC_APPROVED:'true',AI_APPROVED_LANGUAGES:'en,ar',OPENAI_API_KEY:'fake-private',OPENAI_ANALYSIS_MODEL:'configured-test-model'};assert.equal(draftConfig(env).enabled,false);assert.equal(draftConfig({...env,AI_DRAFTS_ENABLED:'true'}).enabled,true);
+ const outline={schema_version:'draft-1',language:'en',tone:'PROFESSIONAL',blocks:['THANKS'],evidence:[]};const config=draftConfig({...env,AI_DRAFTS_ENABLED:'true'});
+ const result=await requestDraft(snapshot,{language:'en',tone:'PROFESSIONAL',instruction:'Ask for missing needs'},config.base,crypto.randomUUID(),async(url,init)=>{assert.equal(url,'https://api.openai.com/v1/responses');const body=JSON.parse(String(init?.body));assert.equal(body.store,false);assert.deepEqual(body.tools,[]);assert.equal(body.text.format.name,'reply_outline');assert.equal(body.text.format.strict,true);assert.match(body.input[1].content,/Ask for missing needs/);return Response.json({status:'completed',usage:{total_tokens:30},output:[{type:'message',role:'assistant',content:[{type:'output_text',text:JSON.stringify(outline)}]}]});});assert.deepEqual(result.analysis,outline);assert.equal(result.tokens,30);
+});
+test('draft worker preserves known/unknown usage on outline rejection and bounds claims with no raw output',async()=>{
+ const calls:{name:string;args:any}[]=[];let n=0;const db={rpc:async(name:string,args?:any)=>{calls.push({name,args});if(name==='worker_claim_draft')return {data:n++===0?{id:crypto.randomUUID(),lease_token:crypto.randomUUID()}:null,error:null};if(name==='worker_prepare_draft')return {data:{snapshot:{...snapshot,draft_options:{language:'en',tone:'PROFESSIONAL',instruction:''}},model:'configured-test-model',languages:['en'],provider_request_id:crypto.randomUUID()},error:null};return {data:{state:'FAILED'},error:null};}};
+ const result=await runDrafts(db,{enabled:true,base:{enabled:true,key:'private',model:'configured-test-model',languages:['en']}},async()=>({analysis:{schema_version:'draft-1',language:'en',tone:'PROFESSIONAL',blocks:['CLAIM_AVAILABILITY'],evidence:[]},tokens:60}));const failure=calls.find(c=>c.name==='worker_fail_analysis')!;assert.equal(failure.args.p_tokens,60);assert.equal(failure.args.p_uncertain,false);assert.equal(failure.args.p_code,'INVALID_SCHEMA');assert.equal(result.jobs[0].state,'FAILED');assert.ok(!JSON.stringify(result).includes(snapshot.messages[0].body));
+});

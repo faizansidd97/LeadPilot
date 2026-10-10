@@ -1,0 +1,15 @@
+'use client';
+import type { Lead } from '@/components/workspace';
+export class ApiClientError extends Error{status:number;code?:string;retryAfter?:number;constructor(message:string,status:number,code?:string,retryAfter?:number){super(message);this.status=status;this.code=code;this.retryAfter=retryAfter;}}
+export async function requestApi(path:string,options:RequestInit={},tenant?:string,key?:string){
+ const headers=new Headers(options.headers);headers.set('Content-Type','application/json');if(tenant)headers.set('X-Tenant-Id',tenant);if(key)headers.set('Idempotency-Key',key);
+ let response:Response;
+ try{response=await fetch(path,{...options,headers,cache:'no-store'});}
+ catch(error){if(options.signal?.aborted)throw error;throw new ApiClientError('Connection interrupted. Retry the same action to check its result.',503,'CONNECTION_INTERRUPTED');}
+ let body:any;
+ try{body=await response.json();}catch(error){if(options.signal?.aborted)throw error;throw new ApiClientError('The service response could not be read. Retry the same action.',response.ok?503:response.status,'INVALID_RESPONSE');}
+ if(!response.ok){const messages=[body?.error?.message,...Object.values(body?.error?.field_errors??{})].filter((value):value is string=>typeof value==='string');throw new ApiClientError(messages.join(' ').slice(0,2000)||'Request failed. Retry or sign in again.',response.status,typeof body?.error?.code==='string'?body.error.code:undefined,typeof body?.error?.retry_after==='number'?body.error.retry_after:undefined);}
+ if(!body||typeof body!=='object'||!Object.hasOwn(body,'data')||Object.hasOwn(body,'error'))throw new ApiClientError('The service response could not be verified. Retry the same action.',503,'INVALID_RESPONSE');
+ return body.data;
+}
+export function toLead(row:Record<string,unknown>):Lead{return {created_at:row.created_at as string,current_analysis:row.current_analysis as Lead['current_analysis'],id:row.id as string,name:row.full_name as string,email:row.email as string||'',phone:row.phone as string||'',status:row.status as Lead['status'],area:(row.locations as string[]|undefined)?.join(', ')||'Not specified',source:row.source as string,message:'',version:row.version as number,do_not_contact:row.do_not_contact as boolean,budget_min:row.budget_min as number|null,budget_max:row.budget_max as number|null,locations:row.locations as string[]|undefined,confirmed_intent:row.confirmed_intent as string|null,qualification_summary:row.qualification_summary as string|null,outcome_summary:row.outcome_summary as string|null,won_at:row.won_at as string|null,lost_reason:row.lost_reason as string|null,archived_at:row.archived_at as string|null,assignee_id:row.assignee_id as string|null,currency:row.currency as string|null,budget_period:row.budget_period as string,property_type:row.property_type as string|null,bedrooms:row.bedrooms as number|null,purchase_timeline:row.purchase_timeline as string|null,source_reference:row.source_reference as string|null,notes:row.notes as string,reported_facts:row.reported_facts as Record<string,unknown>,duplicate_review:row.duplicate_review as boolean};}

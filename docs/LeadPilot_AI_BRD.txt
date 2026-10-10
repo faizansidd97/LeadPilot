@@ -1,0 +1,455 @@
+LeadPilot AI
+Business Requirements Document
+Product vision scope and business requirements
+Version 1.0  |  5 October 2026  |  LP BRD 001
+Prepared for product stakeholders, agency pilot partners, and the delivery team.
+Review status: proposed product baseline. Complete approval records and unresolved decisions before treating this specification as a release commitment.
+Document control
+Value
+Product
+Multi tenant AI lead management and follow up for UAE real estate agencies
+Document owner
+Product Owner role to be assigned
+Companion
+LP FSD 001 Functional Specification
+Change control
+Versioned requests with scope, risk, cost, and acceptance impacts
+Approval
+Sponsor, agency representative, engineering lead, security and privacy reviewers
+
+
+Contents
+1 Executive overview3
+2 Product vision and business context3
+3 Objectives and success measures3
+4 Stakeholders and governance4
+5 Personas and operating needs4
+6 Scope and release boundaries5
+7 Assumptions constraints and dependencies6
+8 Business processes6
+9 Business rules7
+10 Business requirement catalogue7
+11 AI business requirements and guardrails9
+12 Non functional requirements10
+13 Security privacy and audit outcomes10
+14 Billing reporting and integrations10
+15 Risks and mitigations11
+16 Acceptance and release governance11
+17 Open questions and decision register12
+18 Approval and change record12
+
+Use Word navigation headings to move between sections. Update the contents field after editing.
+
+1 Executive overview
+LeadPilot AI will help UAE real estate agencies capture inquiries, understand buyer and tenant intent, prepare relevant replies, and follow up consistently. The product combines a shared lead workspace with AI assistance while keeping agents responsible for customer communication and sales decisions.
+The first release is a focused pilot: manual entry, CSV import, website lead ingestion, assignment and pipeline, manually recorded conversations, AI analysis, reviewed suggestions, reminders, notifications, and agency administration. It must demonstrate operational value before investment in channel automation and subscription infrastructure.
+This BRD defines outcomes and boundaries. LP FSD 001 translates them into implementation behavior and acceptance tests. Proposed targets, commercial terms, language support, and governance settings require approval through the decision register.
+2 Product vision and business context
+Vision: give agency teams one trustworthy workspace for every inquiry and every next action, so qualified opportunities receive timely attention and managers can see where leads stall.
+Fragmented lead handling across forms, spreadsheets, and messaging applications can make interpretation and follow up inconsistent. LeadPilot AI is a workflow assistant, not a marketplace or autonomous broker. No market size, revenue forecast, or conversion improvement is assumed without pilot evidence.
+2.1 Value proposition
+Owners gain visibility into lead ownership, activity, and follow up discipline.
+Administrators gain reliable intake and assignment with fewer unowned inquiries.
+Agents get a summary of needs, transparent priority score, draft response, and next action.
+Customers receive relevant human reviewed responses and respect for contact preferences.
+3 Objectives and success measures
+Targets are proposed pilot goals, not measured benefits or contractual guarantees. Establish a two week agency baseline and evaluate at least four weeks of live pilot use. The Product Owner approves revised targets before pilot start.
+Objective
+Measure and proposed target
+Owner
+Adoption
+80% of invited agents activate; 70% of active agents use the app on 3 days per week.
+Product Owner
+Capture coverage
+90% of agreed pilot intake recorded; reconcile source counts with accepted and rejected records.
+Administrator
+Follow up discipline
+90% of reminders completed or explicitly rescheduled within 24 hours after due time.
+Agency manager
+Response time
+Reduce median captured inquiry to first logged outbound contact time by 25% against baseline.
+Agency manager
+AI usefulness
+70% of sampled suggestions rated useful; edits, rejection, and copying measured separately.
+Product Owner
+AI factual quality
+95% of populated extraction fields supported by source evidence on an approved evaluation set.
+AI lead
+Security
+Zero unauthorized cross tenant operations in release tests; all negative permission cases pass.
+Security reviewer
+Commercial validation
+Document willingness to pay from at least 2 pilot agencies; no assumed price or revenue.
+Sponsor
+
+Logged contact is user asserted in MVP, not proof of delivery or a sale. Conversion uplift remains exploratory until outcome data and comparable baselines are reliable.
+4 Stakeholders and governance
+Stakeholder
+Responsibility
+Decision authority
+Sponsor
+Funding, strategic fit, pilot selection.
+Commercial model and investment
+Product Owner
+Baseline, priority, changes, and acceptance evidence.
+Scope and feature acceptance
+Agency owner
+Workflows, team access, pilot value.
+Agency settings and UAT
+Administrator
+Intake, assignments, and staff workflow.
+Daily operating rules
+Agent
+Review AI, contact customers, update outcomes.
+Assigned lead actions
+Engineering lead
+Architecture, migrations, implementation, operations.
+Technical readiness
+QA lead
+Journeys, permissions, AI regression, release evidence.
+Quality evidence
+Security and privacy reviewers
+Isolation, data flows, contracts, retention, incident readiness.
+Security and privacy approval
+Support operator
+Controlled support and incident procedures.
+Escalation and restoration
+
+Platform support is outside tenant roles and has no default right to browse lead content. Exceptional access requires scoped approval, expiry, purpose, and audit.
+5 Personas and operating needs
+Persona
+Need
+Successful journey
+Small agency owner
+Quick setup and oversight.
+Creates agency, invites agents, checks overdue work and unassigned leads.
+Sales administrator
+Reliable intake and balanced assignment.
+Imports leads, reviews duplicates, and reassigns departing member workload.
+Property agent
+Understand and act on an inquiry.
+Checks budget and area, edits a reply, schedules callback, records outcome.
+Manager acting as ADMIN
+Understand pipeline and activity.
+Reviews dashboard and stalled leads with status history.
+Prospective buyer or tenant
+Relevant responses and contact respect.
+Inquiry is accurate and do not contact preference prevents new outreach.
+
+6 Scope and release boundaries
+6.1 MVP scope
+Responsive English web interface; preserve multilingual customer text and allow selected reply language. Full Arabic interface and right to left layout require later approval.
+Agencies, verified access, OWNER ADMIN AGENT, invitations, agency timezone, and guided onboarding.
+Manual entry, bounded CSV import, server authenticated website intake, duplicate review, assignment, search, filters, status changes, and archiving.
+Text conversations and internal notes entered manually or supplied through website intake with source attribution.
+Structured AI analysis, evidence, deterministic score, uncertainty, draft editing, review and copying, feedback, versioning, and usage caps.
+Follow ups, in app notices, operational dashboard, append only activity history, and pilot measurement.
+Manual commercial management outside app; security, backups, privacy requests, and support runbooks.
+6.2 Exclusions from MVP
+WhatsApp or email sending, social messaging sync, read receipts, call recordings, and automated outreach.
+Native mobile apps, offline sync, property inventory, live availability, marketplace, booking calendars, transaction settlement.
+Autonomous messaging, negotiation, commitments, financing assessments, or unapproved status changes.
+RAG, vector databases, browsing, document attachments, custom ML training, and customer data used for model training.
+Self service payment, tax invoice automation, coupons, dunning, enterprise SSO, custom roles, and configurable pipelines.
+Automatic merging, contact enrichment, bulk marketing, revenue attribution, and cross agency customer sharing.
+6.3 Roadmap
+Release
+Capabilities
+Gate
+MVP pilot
+Core lead workflow and AI assistance; manual commercial setup.
+End to end UAT, isolation, AI quality, restore, and privacy approvals.
+Phase 2
+WhatsApp and email, subscription billing, basic CSV export and funnel reports, improved duplicates, optional Arabic interface.
+Pilot value confirmed; official access, privacy review, delivery and billing lifecycle tests.
+Phase 3
+Portal and CRM adapters where supported, calendars, listing retrieval, advanced reports, approved configurable automation.
+Validated demand and contracts; integration, grounding, and authorization evaluation.
+
+Roadmap sequencing is not a committed schedule. Each phase requires separate estimates and an approved functional change set. GCC expansion is an option after UAE validation.
+7 Assumptions constraints and dependencies
+ID
+Baseline
+Implication
+AS 01
+One agency is one tenant; a user may join several agencies with separate roles.
+Tenant switching must not broaden visibility.
+AS 02
+Pilot administrator reconciles source and outcome data.
+Incomplete logging weakens response and conversion measures.
+AS 03
+English interface sufficient initially; messages can contain Arabic or other languages.
+Validate language quality before claiming support.
+AS 04
+Pricing, quotas, seat limits, and retention are not approved.
+Use configured pilot values and resolve before production.
+CO 01
+Next.js 16 React TypeScript Tailwind/shadcn React Hook Form Zod.
+Pin supported versions after compatibility review.
+CO 02
+Supabase PostgreSQL Auth RLS, OpenAI Responses API, Vercel.
+Confirm plans, processing terms, regions, cost and capacity.
+CO 03
+Modular monolith with durable database jobs.
+Bounded work must recover after interruption.
+DE 01
+Agency sample inquiries, users, and source access available.
+Use approved deidentified tests before live data.
+DE 02
+Auth email delivery, API keys, backup capability, and suitable cron plan exist.
+Provisioning blocks production acceptance if missing.
+DE 03
+Review notices, agency authority, processor contracts, hosting, and transfers.
+The stack does not establish UAE residency or legal compliance.
+
+8 Business processes
+8.1 Agency setup
+Owner verifies account, creates agency, chooses timezone default Asia/Dubai, confirms approved processing settings, and invites staff. Administrator configures website credentials if needed and tests a sample lead. Owner verifies visibility and reminders before live data loading.
+8.2 Inquiry to qualified opportunity
+An inquiry is entered, imported, or accepted by signed website request. Validation and tenant scoped duplicate review precede creation in NEW status. Manager assigns a member. AI extracts needs with evidence and priority score. Agent reviews and corrects facts, contacts externally, logs the actual message, sets status, and schedules the next action.
+8.3 Follow up and closure
+Due reminder produces an in app notice. Agent checks current context and contact preference, performs the external action, and completes or reschedules. WON and LOST require explicit user action and outcome details. Terminal outcomes cancel open tasks after confirmation. Reopening requires reason and does not reactivate cancelled tasks.
+8.4 Exceptions and offboarding
+Invalid intake returns actionable feedback; duplicates require review. AI failure does not block manual work. Departing members lose access immediately and their leads and open reminders transfer to an active member or the manager queue. Audit retains stable attribution under approved retention.
+9 Business rules
+BU 01  Every customer operation belongs to one agency. Tenant is resolved from verified membership or intake credential, never customer payload authority.
+BU 02  Exactly one active OWNER per agency; only owner transfers ownership or initiates closure. Transfer is atomic.
+BU 03  ADMIN manages agency leads and AGENT members, but not ADMIN or OWNER roles. AGENT sees assigned leads only.
+BU 04  Lead requires name and valid email or phone. Normalize contact keys without treating a match as verified identity.
+BU 05  Duplicates are warnings; no automatic merge or cross tenant matching.
+BU 06  Lifecycle status, temperature, AI score, and reminder state are independent. AI never changes sales status.
+BU 07  Human confirmed facts take precedence; AI does not overwrite them without explicit adoption.
+BU 08  Replies require review. Copying is not sending; outbound logging is a separate action.
+BU 09  Do not contact blocks new outreach drafts and tasks and cancels existing outreach tasks. Internal privacy tasks may remain.
+BU 10  Persist UTC; present agency local timezone and derive scheduling from saved UTC time.
+BU 11  WON requires outcome date and summary; LOST requires controlled reason. AI or inactivity never closes a lead.
+BU 12  Terminal and archived leads cannot receive open outreach tasks; reopening is explicit and audited.
+BU 13  Critical mutation and audit commit together; repeated intake jobs and scans must not duplicate results.
+BU 14  Deactivation preserves history and reassigns work; deletion follows approved policy and minimizes retained evidence.
+BU 15  Seat and AI limits are server enforced with atomic reservations. AI limits leave manual CRM available.
+10 Business requirement catalogue
+MVP requirements are mandatory unless removed by approved change. F identifiers map to LP FSD 001. Future requirements are planning scope, not MVP acceptance obligations.
+BR 01 Agency onboarding and account access
+MVP | F 01
+Verified accounts create an agency, invite a team, and use a guided onboarding checklist.
+BR 02 Tenant and role isolation
+MVP | F 02
+OWNER and ADMIN see agency records; AGENT sees assigned leads and child records only.
+BR 03 Lead capture and validation
+MVP | F 03
+Manual entry, CSV import, and authenticated website webhook create traceable validated leads.
+BR 04 Lead inbox and pipeline
+MVP | F 04
+Users search, filter, assign, and progress leads while preserving status history.
+BR 05 Conversation history
+MVP | F 05
+Incoming and outgoing message logs remain distinct from internal notes and verified delivery.
+BR 06 AI qualification
+MVP | F 06
+AI extracts supported facts and produces evidence, uncertainty, and an explainable reproducible score.
+BR 07 Human reviewed reply assistance
+MVP | F 07
+User reviews and edits a suggestion before copying externally; no automatic sending.
+BR 08 Follow up management
+MVP | F 08
+Reminders support due, overdue, completed, cancelled, and rescheduled outcomes.
+BR 09 Operational dashboard
+MVP | F 09
+Role scoped counts and drill downs use documented metric definitions.
+BR 10 Notifications
+MVP | F 10
+In app assignment, due reminders, and AI completion events are authorized and deduplicated.
+BR 11 Team and agency administration
+MVP | F 11
+Managers invite, change permitted roles, reassign work, and disable members safely.
+BR 12 Accountability and audit
+MVP | F 12
+Critical mutations create protected audit events with actor and tenant context.
+BR 13 Privacy and secure operations
+MVP | F 13
+Retention, deletion, access recovery, backups, and secret management pass release review.
+BR 14 Continuity and service quality
+MVP | F 14
+Manual CRM remains available when AI fails; performance and recovery gates are measured.
+BR 15 Subscription billing
+Phase 2 | F 15
+Provider managed subscriptions and entitlements follow approved commercial policies.
+BR 16 Channel and CRM integrations
+Phase 2 and 3 | F 16
+Approved adapters maintain source and delivery evidence and customer contact preferences.
+BR 17 Advanced reporting
+Phase 2 and 3 | F 17
+Authorized exports and funnel reports use consistent definitions and tenant scopes.
+11 AI business requirements and guardrails
+AI interprets customer supplied text rather than manufactures property facts. Extract intent, budget, area, property type, timing, financing mentions, and questions only where supported. Missing values remain unknown; conflicts are highlighted.
+Display evidence, analysis time, versions, uncertainty and freshness. Score is a prioritization aid, not probability of purchase or assessment of a person.
+Use an approved deterministic rubric based on declared commercial needs and timing. Do not use nationality, religion, ethnicity, gender, health, or sensitive traits.
+Treat messages as untrusted data. Embedded instructions cannot override application instructions, reveal secrets, use tools, or expose other records.
+Do not invent listings, availability, discounts, returns, legal conclusions, visa eligibility, or financing approval. Ask for verified facts or clarification.
+Minimize personal information sent to providers; redact contacts where unnecessary. Never send agency database or audit history.
+Use versioned evaluations for English, Arabic, mixed language, vague budgets, conflicts, injection, unsafe responses, and provider failure.
+Tenant administrators can disable AI; a platform kill switch stops new AI work without disabling CRM. Record useful, incorrect and unsafe feedback.
+12 Non functional requirements
+ID
+Requirement
+Proposed release measure
+NF 01
+Performance
+Core API p95 below 1.5 seconds at 50 concurrent users and 10,000 leads per tenant; primary UI interactive within 3 seconds on reference network.
+NF 02
+AI latency
+Job submission below 1.5 seconds; 95% normal jobs finish within 60 seconds at pilot load, excluding declared provider incidents.
+NF 03
+Availability
+99.5% monthly core availability target; agree measurement and exclusions before any SLA.
+NF 04
+Recovery
+RPO 24 hours and RTO 8 hours pending backup tier and restore exercise.
+NF 05
+Reminders
+Scan every 5 minutes on eligible plan, catch up missed scans; target due notice within 10 minutes normally.
+NF 06
+Security
+Tenant and role enforcement at API and database, secret isolation, protected sessions, rate limits and audit.
+NF 07
+Accessibility
+Target WCAG 2.2 AA core journeys with keyboard, labels, focus and non color status cues.
+NF 08
+Maintainability
+Versioned migrations, critical automated tests, isolated environments, monitoring and runbooks.
+NF 09
+Integrity
+Idempotent intake and jobs, concurrency checks, tenant safe references and transactional critical mutations.
+NF 10
+Portability
+Documented PostgreSQL schema; provider identifiers do not replace business primary keys.
+
+13 Security privacy and audit outcomes
+Active membership and assignment restrict leads, conversations, AI results, searches, notifications, aggregates, and workers. RLS complements application authorization; hiding UI controls is insufficient. Privileged backend work needs explicit tenant checks because provider service credentials can bypass RLS.
+Before live intake, approve processing authority, notices, contracts, regions, subprocessors, transfers, retention and privacy request handling. These are review dependencies, not legal conclusions. No UAE only residency is assumed. Identity documents and financial documentation are excluded from MVP.
+Audit shows actor, tenant, record, old and new states, UTC time, and required reason. Users cannot alter audit events. High risk administration and exceptional support require stronger access checks and evidence. Retention and deletion behavior appears in the FSD.
+14 Billing reporting and integrations
+MVP commercial terms are manual. OWNER sees pilot access and configured seat and AI limits, without checkout or automated invoice. Phase 2 adds approved plans, subscriptions, seats, renewal, cancellation, grace periods and reconciled billing webhooks. Price, provider, tax, invoice, refund and failed payment policy are open.
+MVP reports are operational counts and filtered lists. Phase 2 adds permitted CSV exports and dated source and funnel reports. Phase 3 adds cohorts and attribution only after deal values and verified channel timestamps are reliable. User logged contact must not appear as verified delivery.
+Official integration access and agency consent are dependencies. WhatsApp needs contact preference, template and outreach policy checks where applicable, verified callbacks, deduplication, and delivery failure handling. Portal and CRM adapters require supported APIs and contracts; access is not presumed.
+15 Risks and mitigations
+Risk
+Impact
+Mitigation and owner
+Low adoption
+Incomplete source of truth.
+Pilot training and weekly usage review; Product Owner.
+AI fabrication
+Customer misinformation.
+Evidence, constrained prompts, deterministic score, human review and regression; AI lead.
+Isolation defect
+Unauthorized exposure.
+Default deny RLS, tenant safe keys and negative tests; security and engineering.
+Unapproved processing
+Live pilot blocked.
+Resolve regions, notices and contracts first; sponsor and privacy reviewer.
+Quota and cost growth
+Margins or AI availability suffer.
+Usage reservations, caps and fallback; engineering lead.
+Repeated or delayed scans
+Duplicate or missed notices.
+Durable leases, unique notice keys and lag alerts; operations.
+Poor source data
+Misleading metrics.
+Validation, reconciliation and outcome rules; administrator.
+Premature expansion
+Pilot delayed and cost rises.
+Phase boundaries and change control; Product Owner.
+Integration approval delay
+Later phase blocked.
+Verify official access before dates; integration owner.
+Member departure
+Forgotten workload.
+Immediate access revoke and reassignment; agency owner.
+
+16 Acceptance and release governance
+Release requires core workflow evidence and approved pilot measurement. Critical isolation, data loss, and unsafe automatic sending defects block release. Noncritical deviations need named owner, mitigation, and dated approval.
+Gate
+Evidence
+Approver
+Business UAT
+Agency create, team invites, three capture paths, reviewed reply, task complete, close and reopen.
+Agency and Product Owner
+Isolation
+Negative tenant and assignment tests across records, aggregates, jobs and notifications.
+Security reviewer
+AI quality
+Representative evaluation, evidence, refusals, failures and unsafe draft cases.
+AI lead and Product Owner
+Operations
+Load, catch up scans, rotation, restore, incident and support runbooks.
+Engineering lead
+Privacy
+Approved settings, notices, contracts, regions and deletion workflow.
+Privacy reviewer
+Coverage
+BR 01 to BR 14 mapped to F requirements and A tests with passed evidence.
+QA lead
+
+17 Open questions and decision register
+Decision
+Proposed default or action
+Owner
+D 01 Commercial
+Manual pilot; approve prices, seats, AI caps, trial duration and paid launch gate.
+Sponsor
+D 02 Processing
+Confirm regions and acceptable transfers before live intake.
+Privacy reviewer
+D 03 Retention
+Approve lead, message, audit, AI, backup and deletion retention.
+Privacy reviewer
+D 04 Language
+English UI; evaluate Arabic and mixed language before support claims.
+Product Owner
+D 05 Qualification
+Approve scoring rubric and qualified criteria.
+Agency and Product Owner
+D 06 Assignment
+Manual assignment initially; decide round robin later.
+Product Owner
+D 07 Visibility
+AGENT assigned only; confirm later team partitions.
+Agency owner
+D 08 Channels
+Select first Phase 2 channel and official provider.
+Sponsor
+D 09 Service targets
+Approve load, SLA, cron plan, backup, RPO and RTO.
+Engineering lead
+D 10 Notifications
+In app only initially; decide email push and escalation later.
+Product Owner
+D 11 Billing
+Select payments, tax, invoices, refunds and grace periods.
+Finance and sponsor
+D 12 Outcomes
+Approve lost reasons and won summary; deal value optional.
+Agency representative
+
+18 Approval and change record
+Version 1.0 dated 5 October 2026 establishes the initial review baseline. Approval does not close open decisions. Resolve D 02, D 03 and D 09 before live intake; record approved values and revise the FSD when behavior changes.
+Role
+Name and approval date
+Comments
+Sponsor
+To be completed
+
+Agency representative
+To be completed
+
+Product Owner
+To be completed
+
+Engineering lead
+To be completed
+
+Security and privacy reviewers
+To be completed
+
+

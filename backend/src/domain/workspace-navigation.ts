@@ -1,0 +1,5 @@
+import {z} from 'zod';
+export const workspaceViews=['Dashboard','Leads','Follow ups','Notifications','Capture','Settings'] as const;
+export const workspaceFiltersSchema=z.object({view:z.enum(workspaceViews).default('Dashboard'),status:z.enum(['ALL','NEW','CONTACTED','QUALIFIED','FOLLOW_UP','WON','LOST']).default('ALL'),archived:z.enum(['true','false']).default('false')});
+export function readWorkspaceFilters(search:string){const values=Object.fromEntries(new URLSearchParams(search));const parsed=workspaceFiltersSchema.safeParse(values);return parsed.success?parsed.data:{view:'Dashboard' as const,status:'ALL',archived:'false'};}
+export function writeWorkspaceFilters(values:{view:string;status?:string;archived?:boolean}){const parsed=workspaceFiltersSchema.parse({view:values.view,status:values.status??'ALL',archived:String(values.archived??false)});const params=new URLSearchParams({view:parsed.view});if(parsed.view==='Leads'){if(parsed.status!=='ALL')params.set('status',parsed.status);if(parsed.archived==='true')params.set('archived','true');}return '?'+params.toString();}

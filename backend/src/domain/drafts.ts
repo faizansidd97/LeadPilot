@@ -1,0 +1,34 @@
+import {z} from 'zod';
+import {AnalysisFailure,type Snapshot} from './analysis.ts';
+export const DRAFT_VERSION='draft-1';
+const version=z.number().int().positive();
+export const draftOptionsSchema=z.object({language:z.enum(['en','ar']),tone:z.enum(['PROFESSIONAL','FRIENDLY']),instruction:z.string().trim().max(500).default('')}).strict();
+export type DraftOptions=z.infer<typeof draftOptionsSchema>;
+export const generateDraftSchema=draftOptionsSchema.extend({expected_version:version});
+export const editDraftSchema=z.object({expected_version:version,text:z.string().trim().min(1).max(5000)}).strict();
+export const reviewDraftSchema=z.object({expected_version:version,acknowledged:z.literal(true)}).strict();
+export const rejectDraftSchema=z.object({expected_version:version,reason:z.string().trim().min(5).max(500)}).strict();
+export const feedbackDraftSchema=z.object({expected_version:version,category:z.enum(['USEFUL','INCORRECT','UNSAFE','UNHELPFUL']),comment:z.string().trim().max(500).default('')}).strict();
+export const copiedDraftSchema=z.object({expected_version:version,copy_token:z.uuid()}).strict();
+export const blocks=['THANKS','ACK_INTENT','ACK_BUDGET','ACK_AREA','ASK_INTENT','ASK_BUDGET','ASK_AREA','ASK_PROPERTY','ASK_TIMELINE','ASK_NEXT_STEP','CHECK_AVAILABILITY','VIEWING_REQUEST','CALLBACK_REQUEST','CLOSE'] as const;
+export const outlineSchema=z.object({schema_version:z.literal(DRAFT_VERSION),language:z.enum(['en','ar']),tone:z.enum(['PROFESSIONAL','FRIENDLY']),blocks:z.array(z.enum(blocks)).min(1).max(10),evidence:z.array(z.object({block:z.enum(['VIEWING_REQUEST','CALLBACK_REQUEST']),message_id:z.uuid(),message_version:version,excerpt:z.string().min(1).max(240)}).strict()).max(5)}).strict();
+export const outlineJsonSchema=z.toJSONSchema(outlineSchema,{target:'draft-7'});
+export const unsafePattern=/guarantee|guaranteed|guarantees|guaranteeing|مضمون|نضمن|مضمونة|visa|legal|financing|mortgage|تأشيرة|قانوني|تمويل|رهن|discount|خصم|available now|available today|is available|are available|available villas?|available units?|available apartments?|we have [0-9]+ (?:units?|villas?|apartments?)|confirmed viewing|booked|متاح الآن|متاحة الآن|مخفض|حجز مؤكد|ignore previous|ignore all|system prompt|api key|تجاهل التعليمات|<script|javascript:/i;
+export function draftSafety(text:string){return unsafePattern.test(text)?['UNSUPPORTED_OR_UNSAFE_CLAIM']:[];}
+const sentences={en:{THANKS:'Thank you for your inquiry.',ASK_INTENT:'Are you looking to buy, rent, sell or invest?',ASK_BUDGET:'What budget and currency would you prefer?',ASK_AREA:'Which areas would you prefer?',ASK_PROPERTY:'What property type and number of bedrooms do you need?',ASK_TIMELINE:'What is your preferred timeframe?',ASK_NEXT_STEP:'Would you prefer a callback or a viewing enquiry?',CHECK_AVAILABILITY:'We will need to check property availability before confirming any option.',VIEWING_REQUEST:'What day and time would suit you for a viewing enquiry? We will check availability before confirming.',CALLBACK_REQUEST:'What day and time would suit you for a callback?',CLOSE:'Please share any other requirements you would like us to consider.'},ar:{THANKS:'شكراً لاستفسارك.',ASK_INTENT:'هل ترغب في الشراء أو الإيجار أو البيع أو الاستثمار؟',ASK_BUDGET:'ما الميزانية والعملة المفضلتان لديك؟',ASK_AREA:'ما المناطق التي تفضلها؟',ASK_PROPERTY:'ما نوع العقار وعدد غرف النوم المطلوب؟',ASK_TIMELINE:'ما الإطار الزمني المناسب لك؟',ASK_NEXT_STEP:'هل تفضل مكالمة أم الاستفسار عن معاينة؟',CHECK_AVAILABILITY:'نحتاج إلى التحقق من توفر العقار قبل تأكيد أي خيار.',VIEWING_REQUEST:'ما اليوم والوقت المناسبان للاستفسار عن معاينة؟ سنتحقق من التوفر قبل التأكيد.',CALLBACK_REQUEST:'ما اليوم والوقت المناسبان لمكالمة؟',CLOSE:'يرجى مشاركة أي متطلبات أخرى تود أن نأخذها في الاعتبار.'}};
+export function renderDraft(input:unknown,snapshot:Snapshot,options:DraftOptions,languages:string[]){
+ const parsed=outlineSchema.safeParse(input);if(!parsed.success)throw new AnalysisFailure('INVALID_SCHEMA');const outline=parsed.data;
+ if(outline.language!==options.language||outline.tone!==options.tone||!languages.includes(options.language)||new Set(outline.blocks).size!==outline.blocks.length)throw new AnalysisFailure('INVALID_EVIDENCE');
+ const source=new Map(snapshot.messages.map(m=>[m.id,m]));
+ for(const evidence of outline.evidence){const m=source.get(evidence.message_id);if(!m||m.version!==evidence.message_version||!m.body.includes(evidence.excerpt)||/ignore previous|ignore all|تجاهل التعليمات/i.test(evidence.excerpt))throw new AnalysisFailure('INVALID_EVIDENCE');}
+ const facts=snapshot.confirmed,lang=options.language,lines:string[]=[];
+ for(const block of outline.blocks){
+  if(block==='ACK_INTENT'){const intents={BUY:['buying','الشراء'],RENT:['renting','الإيجار'],SELL:['selling','البيع'],INVEST:['investing','الاستثمار']};const intent=intents[facts.confirmed_intent as keyof typeof intents];if(!intent)throw new AnalysisFailure('INVALID_EVIDENCE');lines.push(lang==='ar'?`فهمنا أن اهتمامك هو ${intent[1]}.`:`We have noted your interest in ${intent[0]}.`);}
+  else if(block==='ACK_BUDGET'){const amount=facts.budget_min??facts.budget_max;if(typeof amount!=='number'||!Number.isFinite(amount)||amount<0||!['AED','USD','EUR','GBP','SAR'].includes(String(facts.currency)))throw new AnalysisFailure('INVALID_EVIDENCE');const range=facts.budget_min!==null&&facts.budget_min!==undefined&&facts.budget_max!==null&&facts.budget_max!==undefined&&facts.budget_min!==facts.budget_max?`${facts.budget_min}–${facts.budget_max}`:String(amount);lines.push(lang==='ar'?`سجلنا ميزانيتك ${range} ${facts.currency}.`:`We have noted your budget of ${range} ${facts.currency}.`);}
+  else if(block==='ACK_AREA'){if(!Array.isArray(facts.locations)||!facts.locations.length||facts.locations.some(v=>typeof v!=='string'||v.length>120))throw new AnalysisFailure('INVALID_EVIDENCE');lines.push(lang==='ar'?`سجلنا المناطق المفضلة: ${facts.locations.join('، ')}.`:`We have noted your preferred areas: ${facts.locations.join(', ')}.`);}
+  else{if(block==='VIEWING_REQUEST'||block==='CALLBACK_REQUEST'){const pattern=block==='VIEWING_REQUEST'?/\b(viewing|visit)\b|معاينة|زيارة/i:/\b(call|callback)\b|اتصل|اتصال/i;if(!outline.evidence.some(e=>e.block===block&&pattern.test(e.excerpt)&&!/\b(not|don't|no longer)\b|لا أريد|لا اريد/i.test(e.excerpt)))throw new AnalysisFailure('INVALID_EVIDENCE');}lines.push(sentences[lang][block]);}
+ }
+ if(options.tone==='FRIENDLY')lines.unshift(lang==='ar'?'مرحباً!':'Hello!');
+ const text=lines.join('\n\n'),flags=draftSafety(text);return {schema_version:DRAFT_VERSION,language:lang,tone:options.tone,text,safety_flags:flags,outline};
+}
+export type DraftOutput=ReturnType<typeof renderDraft>;

@@ -1,0 +1,95 @@
+{
+  "checked_at": "2026-10-10T08:06:40.2626224Z",
+  "scope": "Configured development project; public-key GET Auth settings and anonymous id LIMIT 0 probes only",
+  "authorization": "User explicitly permitted read-only API checks on 2026-10-10",
+  "report": {
+    "status": "BASELINE_PASS",
+    "checks": [
+      {
+        "check": "auth_configuration",
+        "status": "PASS",
+        "reason": "EMAIL_SIGNUP_REQUIRES_CONFIRMATION"
+      },
+      {
+        "check": "agencies",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "memberships",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "leads",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "messages",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "activity_events",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "follow_ups",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "invitations",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "notifications",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "message_revisions",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "ai_jobs",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "ai_analyses",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "reply_drafts",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "draft_feedback",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "privacy_cases",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      },
+      {
+        "check": "privacy_case_actions",
+        "status": "PASS",
+        "reason": "ANONYMOUS_TABLE_ACCESS_DENIED"
+      }
+    ],
+    "authenticated_acceptance": false,
+    "migration_revision_verified": false,
+    "worker_verified": false,
+    "browser_accepted": false,
+    "release_accepted": false
+  }
+}

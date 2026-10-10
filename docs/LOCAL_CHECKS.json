@@ -1,0 +1,53 @@
+{
+  "generated_at": "2026-10-10T15:59:51.586Z",
+  "node": "v24.19.0",
+  "source": {
+    "sha256": "2c2800df10d84316700ee1b729e49012b0779ff0d231c9d23d1dad43ae31ccb6",
+    "files": 274
+  },
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "regression",
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 95271,
+      "tests": 626,
+      "passed": 626
+    },
+    {
+      "name": "backend-types",
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 7891
+    },
+    {
+      "name": "frontend-types",
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 2544
+    },
+    {
+      "name": "analysis-contracts",
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 373
+    },
+    {
+      "name": "draft-contracts",
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 362
+    },
+    {
+      "name": "production-build",
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 13909
+    }
+  ],
+  "scope": "Local synthetic/emulated Auth/database and compiler evidence only",
+  "hosted_accepted": false,
+  "browser_accepted": false,
+  "release_accepted": false
+}

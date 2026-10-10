@@ -1,0 +1,4 @@
+import {z} from 'zod';
+export const rotationKeyId=z.string().regex(/^[a-z][a-z0-9_-]{0,39}$/).refine(v=>!['constructor','prototype'].includes(v));
+export const intakeRotationSchema=z.object({mode:z.enum(['plan','activate','rewrap','verify']),target:rotationKeyId,expected_policy_version:z.number().int().positive().max(2147483647).optional(),reference:z.string().trim().min(5).max(200).optional(),max_records:z.number().int().min(25).max(10000).default(500)}).strict().superRefine((v,c)=>{if(['activate','rewrap'].includes(v.mode)){if(!v.reference)c.addIssue({code:'custom',path:['reference'],message:'A rotation change reference is required.'});if(!v.expected_policy_version)c.addIssue({code:'custom',path:['expected_policy_version'],message:'Review the current policy version before writing.'});}});
+export type IntakeRotationOptions=z.infer<typeof intakeRotationSchema>;

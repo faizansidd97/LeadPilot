@@ -1,0 +1,15 @@
+{
+  "recorded_at": "2026-10-07T11:27:46.698644+00:00",
+  "command": "pnpm audit --json",
+  "registry": "Configured pnpm registry advisory snapshot",
+  "lock_sha256": "6fc53be9da5a982fa5e94ac39c7d764e530e67e4b730ee161840ac298437a65d",
+  "vulnerabilities": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0
+  },
+  "total_dependencies": 142,
+  "limitations": "Point-in-time registry advisory lookup; no guarantee of absence of vulnerabilities or production exposure."
+}

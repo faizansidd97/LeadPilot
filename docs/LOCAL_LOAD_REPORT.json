@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-10-07T11:26:10.553Z",
+  "engine": "PGlite 0.5.8, in-process PostgreSQL",
+  "node": "v24.19.0",
+  "platform": "win32",
+  "architecture": "x64",
+  "leads": 10000,
+  "tasks": 1000,
+  "identities": 50,
+  "managers": 10,
+  "agents": 40,
+  "connections": 1,
+  "execution": "Sequential identities; NOT 50 concurrent users; no HTTP/browser/provider calls",
+  "scope_assertions": "Each manager sees 10000 leads; each agent sees 200 assigned leads and 20 assigned tasks",
+  "total_duration_ms": 53022,
+  "queries": {
+    "inbox": {
+      "samples": 100,
+      "p50_ms": 310.1,
+      "p95_ms": 405.51,
+      "p99_ms": 437.27,
+      "max_ms": 437.48
+    },
+    "detail": {
+      "samples": 100,
+      "p50_ms": 1.78,
+      "p95_ms": 3.42,
+      "p99_ms": 3.93,
+      "max_ms": 5.31
+    },
+    "dashboard": {
+      "samples": 100,
+      "p50_ms": 31.85,
+      "p95_ms": 568.22,
+      "p99_ms": 612.71,
+      "max_ms": 632.92
+    },
+    "follow_ups": {
+      "samples": 100,
+      "p50_ms": 32.85,
+      "p95_ms": 52.34,
+      "p99_ms": 64.18,
+      "max_ms": 78.21
+    }
+  },
+  "release_performance_accepted": false
+}

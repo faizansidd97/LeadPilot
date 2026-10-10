@@ -1,0 +1,153 @@
+{
+  "checked_at": "2026-10-10T12:04:57.682Z",
+  "status": "LOCAL_AUTOMATIC_REMINDER_SMOKE_PASS",
+  "scope": "Standalone automatic minute cadence, due seeding and one notification write followed by an idle scheduled repeat; aggregate development worker RPC evidence only",
+  "source": {
+    "sha256": "c960bc41171ad244deb5c34081108138d9a10fbe8a90fadf59a630ebc2295ce7",
+    "files": 263
+  },
+  "configured_interval_ms": 60000,
+  "previous_session": {
+    "started_at": "2026-10-10T11:58:35.468Z",
+    "runs": 2,
+    "successful_runs": 1,
+    "failed_runs": 1,
+    "history": [
+      {
+        "checked_at": "2026-10-10T11:58:38.907Z",
+        "status": "PASS",
+        "summary": {
+          "seeded": 0,
+          "claimed": 0,
+          "succeeded": 0,
+          "cancelled": 0,
+          "needs_recovery": 0,
+          "notifications_written": 0,
+          "metrics": {
+            "due_lag_seconds": 0,
+            "outbox_lag_seconds": 0,
+            "pending_jobs": 0,
+            "failed_jobs": 0,
+            "cleaned_limit_windows": 3,
+            "alert": false
+          },
+          "duration_ms": 3208
+        }
+      },
+      {
+        "checked_at": "2026-10-10T11:59:49.185Z",
+        "status": "UNAVAILABLE",
+        "reason": "WORKER_RUN_NOT_VERIFIED"
+      }
+    ]
+  },
+  "local_cadence_verified": true,
+  "automatic_due_delivery_verified": false,
+  "manual_due_delivery_evidence": "DEV_REMINDER_CHECK.json",
+  "live_graceful_stop_verified": true,
+  "live_restart_verified": true,
+  "protected_http_verified": false,
+  "deployed_scheduler_verified": false,
+  "recipient_ui_verified": false,
+  "release_accepted": false,
+  "observed_completion_spacing_ms": 59745,
+  "user_confirmed_test_reschedule": true,
+  "automatic_notification_write_verified": true,
+  "current_session": {
+    "started_at": "2026-10-10T12:01:09.804Z",
+    "runs": 4,
+    "successful_runs": 4,
+    "failed_runs": 0,
+    "notifications_written": 1,
+    "history": [
+      {
+        "checked_at": "2026-10-10T12:01:11.732Z",
+        "status": "PASS",
+        "summary": {
+          "seeded": 0,
+          "claimed": 0,
+          "succeeded": 0,
+          "cancelled": 0,
+          "needs_recovery": 0,
+          "notifications_written": 0,
+          "metrics": {
+            "due_lag_seconds": 0,
+            "outbox_lag_seconds": 0,
+            "pending_jobs": 0,
+            "failed_jobs": 0,
+            "cleaned_limit_windows": 0,
+            "alert": false
+          },
+          "duration_ms": 1900
+        }
+      },
+      {
+        "checked_at": "2026-10-10T12:02:11.477Z",
+        "status": "PASS",
+        "summary": {
+          "seeded": 0,
+          "claimed": 0,
+          "succeeded": 0,
+          "cancelled": 0,
+          "needs_recovery": 0,
+          "notifications_written": 0,
+          "metrics": {
+            "due_lag_seconds": 0,
+            "outbox_lag_seconds": 0,
+            "pending_jobs": 0,
+            "failed_jobs": 0,
+            "cleaned_limit_windows": 0,
+            "alert": false
+          },
+          "duration_ms": 1638
+        }
+      },
+      {
+        "checked_at": "2026-10-10T12:03:12.513Z",
+        "status": "PASS",
+        "summary": {
+          "seeded": 1,
+          "claimed": 1,
+          "succeeded": 1,
+          "cancelled": 0,
+          "needs_recovery": 0,
+          "notifications_written": 1,
+          "metrics": {
+            "due_lag_seconds": 0,
+            "outbox_lag_seconds": 0,
+            "pending_jobs": 0,
+            "failed_jobs": 0,
+            "cleaned_limit_windows": 0,
+            "alert": false
+          },
+          "duration_ms": 2661
+        }
+      },
+      {
+        "checked_at": "2026-10-10T12:04:11.484Z",
+        "status": "PASS",
+        "summary": {
+          "seeded": 0,
+          "claimed": 0,
+          "succeeded": 0,
+          "cancelled": 0,
+          "needs_recovery": 0,
+          "notifications_written": 0,
+          "metrics": {
+            "due_lag_seconds": 0,
+            "outbox_lag_seconds": 0,
+            "pending_jobs": 0,
+            "failed_jobs": 0,
+            "cleaned_limit_windows": 0,
+            "alert": false
+          },
+          "duration_ms": 1622
+        }
+      }
+    ]
+  },
+  "fixture_notification_identity_verified": false,
+  "automatic_due_cycle_verified": true,
+  "automatic_repeat_idle_verified": true,
+  "job_event_type_independently_verified": false
+}

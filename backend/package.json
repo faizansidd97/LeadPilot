@@ -1,0 +1,52 @@
+{
+  "name": "@leadpilot/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "exports": {
+    "./domain/*": "./src/domain/*.ts",
+    "./server/*": "./src/server/*.ts",
+    "./routes/*": "./src/routes/*.ts"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "setup:supabase": "node scripts/setup-supabase.mjs",
+    "check:supabase": "node scripts/setup-supabase.mjs --check",
+    "verify:supabase": "node --experimental-strip-types scripts/verify-supabase.mjs",
+    "check:workers": "node scripts/setup-supabase.mjs --check --workers",
+    "worker:local": "node --experimental-strip-types scripts/run-local-notifications.mjs --start",
+    "worker:status": "node --experimental-strip-types scripts/run-local-notifications.mjs --status",
+    "worker:stop": "node --experimental-strip-types scripts/run-local-notifications.mjs --stop",
+    "check:intake": "node scripts/setup-supabase.mjs --check --workers --intake",
+    "evaluate:analysis": "node --experimental-strip-types scripts/evaluate-analysis.mjs",
+    "evaluate:drafts": "node --experimental-strip-types scripts/evaluate-drafts.mjs",
+    "benchmark:local": "node --experimental-strip-types scripts/benchmark-local.mjs",
+    "verify:local": "node scripts/verify-local.mjs",
+    "check:release": "node scripts/check-release.mjs",
+    "check:health": "node --experimental-strip-types scripts/check-platform-health.mjs",
+    "inspect:ai-attempts": "node --experimental-strip-types scripts/inspect-ai-attempts.mjs",
+    "rotate:intake-encryption": "node --experimental-strip-types scripts/rotate-intake-encryption.mjs",
+    "rotate:invitation-signing": "node --experimental-strip-types scripts/rotate-invitation-signing.mjs",
+    "rotate:intake-signing-root": "node --experimental-strip-types scripts/rotate-intake-signing-root.mjs"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.2",
+    "next": "16.3.8",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "server-only": "^0.0.1",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@types/node": "24.10.0",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "typescript": "5.9.3"
+  }
+}

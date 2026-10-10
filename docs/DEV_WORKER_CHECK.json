@@ -1,0 +1,104 @@
+{
+  "checked_at": "2026-10-10T09:35:25.700Z",
+  "scope": "User-authorized development notification worker run; bounded due scan and queue drain; no mail transport, AI or schema changes",
+  "status": "WORKER_SMOKE_PASS",
+  "private_key_verified": true,
+  "worker_executed": true,
+  "notification_delivery_verified": true,
+  "scheduler_verified": false,
+  "release_accepted": false,
+  "health": {
+    "database": "REACHABLE",
+    "captured_at": "2026-10-10T09:34:26.102741+00:00",
+    "lag_alert_seconds": 900,
+    "due_lag_seconds": 0,
+    "outbox_lag_seconds": 285,
+    "ai_lag_seconds": 0,
+    "outbox_pending": 1,
+    "outbox_failed": 0,
+    "outbox_expired_leases": 0,
+    "ai_pending": 0,
+    "ai_failed": 0,
+    "ai_expired_leases": 0,
+    "reserved_operations": 0,
+    "reconcile_operations": 0,
+    "observed_tokens_month": 0,
+    "cost_amount": null,
+    "privacy_pending": 0,
+    "privacy_execution_available": false,
+    "scheduler_verified": false,
+    "alert": false
+  },
+  "worker_http_entry_verified": false,
+  "runs": [
+    {
+      "pass": 1,
+      "claimed_event_counts": {
+        "LEAD_ASSIGNED": 1
+      },
+      "seeded": 0,
+      "claimed": 1,
+      "notifications_written": 1,
+      "states": {
+        "SUCCEEDED": 1
+      },
+      "metrics": {
+        "alert": false,
+        "failed_jobs": 0,
+        "pending_jobs": 0,
+        "due_lag_seconds": 0,
+        "outbox_lag_seconds": 0,
+        "cleaned_limit_windows": 0
+      },
+      "duration_ms": 2524
+    },
+    {
+      "pass": 2,
+      "claimed_event_counts": {},
+      "seeded": 0,
+      "claimed": 0,
+      "notifications_written": 0,
+      "states": {},
+      "metrics": {
+        "alert": false,
+        "failed_jobs": 0,
+        "pending_jobs": 0,
+        "due_lag_seconds": 0,
+        "outbox_lag_seconds": 0,
+        "cleaned_limit_windows": 0
+      },
+      "duration_ms": 1599
+    }
+  ],
+  "health_after": {
+    "database": "REACHABLE",
+    "captured_at": "2026-10-10T09:35:25.024899+00:00",
+    "lag_alert_seconds": 900,
+    "due_lag_seconds": 0,
+    "outbox_lag_seconds": 0,
+    "ai_lag_seconds": 0,
+    "outbox_pending": 0,
+    "outbox_failed": 0,
+    "outbox_expired_leases": 0,
+    "ai_pending": 0,
+    "ai_failed": 0,
+    "ai_expired_leases": 0,
+    "reserved_operations": 0,
+    "reconcile_operations": 0,
+    "observed_tokens_month": 0,
+    "cost_amount": null,
+    "privacy_pending": 0,
+    "privacy_execution_available": false,
+    "scheduler_verified": false,
+    "alert": false
+  },
+  "anonymous_worker_health_denied": true,
+  "due_reminder_delivery_verified": false,
+  "repeat_run_idle": true,
+  "local_focused_checks": {
+    "tests": 44,
+    "passed": 44,
+    "failed": 0,
+    "scope": "worker, durable notifications, platform health contract and isolated database checks"
+  }
+}
