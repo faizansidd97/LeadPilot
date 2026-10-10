@@ -10,6 +10,7 @@ export const reviewDraftSchema=z.object({expected_version:version,acknowledged:z
 export const rejectDraftSchema=z.object({expected_version:version,reason:z.string().trim().min(5).max(500)}).strict();
 export const feedbackDraftSchema=z.object({expected_version:version,category:z.enum(['USEFUL','INCORRECT','UNSAFE','UNHELPFUL']),comment:z.string().trim().max(500).default('')}).strict();
 export const copiedDraftSchema=z.object({expected_version:version,copy_token:z.uuid()}).strict();
+export const externalDraftSchema=z.object({expected_version:version,expected_lead_version:version,body:z.string().trim().min(1).max(10000),occurred_at:z.iso.datetime({offset:true}),sent_confirmed:z.literal(true)}).strict().refine(v=>Date.parse(v.occurred_at)<=Date.now(),{path:['occurred_at'],message:'Future message times are not allowed.'});
 export const blocks=['THANKS','ACK_INTENT','ACK_BUDGET','ACK_AREA','ASK_INTENT','ASK_BUDGET','ASK_AREA','ASK_PROPERTY','ASK_TIMELINE','ASK_NEXT_STEP','CHECK_AVAILABILITY','VIEWING_REQUEST','CALLBACK_REQUEST','CLOSE'] as const;
 export const outlineSchema=z.object({schema_version:z.literal(DRAFT_VERSION),language:z.enum(['en','ar']),tone:z.enum(['PROFESSIONAL','FRIENDLY']),blocks:z.array(z.enum(blocks)).min(1).max(10),evidence:z.array(z.object({block:z.enum(['VIEWING_REQUEST','CALLBACK_REQUEST']),message_id:z.uuid(),message_version:version,excerpt:z.string().min(1).max(240)}).strict()).max(5)}).strict();
 export const outlineJsonSchema=z.toJSONSchema(outlineSchema,{target:'draft-7'});

@@ -3,7 +3,7 @@ import {api,checkOrigin,readJson,databaseError,ApiError} from '../server/http.ts
 import {requireTenant} from '../server/supabase.ts';
 import {validate,uuid,requestKey,decodeCursor} from '../domain/contracts.ts';
 import {submitAnalysisSchema} from '../domain/analysis.ts';
-import {generateDraftSchema,editDraftSchema,reviewDraftSchema,rejectDraftSchema,feedbackDraftSchema,copiedDraftSchema} from '../domain/drafts.ts';
+import {generateDraftSchema,editDraftSchema,reviewDraftSchema,rejectDraftSchema,feedbackDraftSchema,copiedDraftSchema,externalDraftSchema} from '../domain/drafts.ts';
 import {draftConfig} from '../server/draft-provider.ts';
 type Context={params:Promise<{id:string}>};
 export const generate=(request:Request,context:Context)=>api(async requestId=>{
@@ -29,6 +29,5 @@ export const reject=(request:Request,context:Context)=>action(request,context,'R
 export const feedback=(request:Request,context:Context)=>action(request,context,'FEEDBACK',feedbackDraftSchema);
 export const authorizeCopy=(request:Request,context:Context)=>action(request,context,'COPY_AUTH',submitAnalysisSchema);
 export const copied=(request:Request,context:Context)=>action(request,context,'COPY_DONE',copiedDraftSchema);
-const externalSchema=z.object({expected_version:z.number().int().positive(),expected_lead_version:z.number().int().positive(),body:z.string().trim().min(1).max(10000),occurred_at:z.iso.datetime({offset:true}),sent_confirmed:z.literal(true)}).strict().refine(v=>Date.parse(v.occurred_at)<=Date.now(),{path:['occurred_at'],message:'Future message times are not allowed.'});
-export const external=(request:Request,context:Context)=>action(request,context,'LOG_EXTERNAL',externalSchema);
+export const external=(request:Request,context:Context)=>action(request,context,'LOG_EXTERNAL',externalDraftSchema);
 export const feedbackSummary=(request:Request)=>api(async()=>{const {db,tenantId}=await requireTenant(request);const {data,error}=await db.rpc('draft_feedback_summary',{p_tenant:tenantId});if(error)databaseError(error);return data;});

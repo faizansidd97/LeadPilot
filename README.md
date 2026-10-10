@@ -11,8 +11,8 @@ The interface is English. Customer inquiries can contain multilingual text; enab
 | Area | Status |
 | --- | --- |
 | P0–P7: foundation, CRM workflows, team, capture, AI modules and dashboard | Implemented and verified locally |
-| P8: hardening and release preparation | In progress; twenty local slices verified, including Facts/duplicate-review recovery and authenticator setup UX |
-| Latest complete local regression | 638/638 tests pass |
+| P8: hardening and release preparation | In progress; twenty-one local slices verified, including AI/reply-draft recovery, Facts/duplicate-review recovery and authenticator setup UX |
+| Latest complete local regression | 655/655 tests pass |
 | Backend and frontend type checks | Pass |
 | Constructed analysis / draft contract evaluations | 100 analysis cases and 56 draft cases pass |
 | Production build | Pass |
@@ -248,7 +248,7 @@ Staging checks, platform monitoring, private AI diagnostics and key-rotation too
 | Team, invitation and account behavior | [Team administration](docs/TEAM_ADMINISTRATION.md), [Auth recovery](docs/AUTH_RECOVERY.md) |
 | Capture and lead data | [Capture](docs/CAPTURE.md), [client recovery](docs/CLIENT_RECOVERY.md), [facts recovery](docs/FACTS_RECOVERY.md) |
 | AI analysis and evaluations | [AI analysis](docs/AI_ANALYSIS.md), [analysis evaluation](docs/AI_EVALUATION.md) |
-| Reviewed drafts | [Reply drafts](docs/REPLY_DRAFTS.md), [draft evaluation](docs/REPLY_EVALUATION.md) |
+| Reviewed drafts | [Reply drafts](docs/REPLY_DRAFTS.md), [draft evaluation](docs/REPLY_EVALUATION.md), [AI client recovery](docs/AI_CLIENT_RECOVERY.md) |
 | Metrics | [Dashboard](docs/DASHBOARD.md) |
 | Worker operation and monitoring | [Operations](docs/OPERATIONS.md), [local scheduler](docs/LOCAL_SCHEDULER.md), [platform monitoring](docs/PLATFORM_MONITORING.md) |
 | Privacy and retained-input verification | [Privacy impact](docs/PRIVACY_IMPACT.md), [privacy recovery](docs/PRIVACY_RECOVERY.md) |

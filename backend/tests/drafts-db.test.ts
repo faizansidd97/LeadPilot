@@ -5,6 +5,8 @@ import {PGlite} from '@electric-sql/pglite';
 import {renderDraft} from '../src/domain/drafts.ts';
 import {validateAnalysis} from '../src/domain/analysis.ts';
 import {emptyAnalysis} from './analysis-fixtures.ts';
+import {validateAiHistory,validateAiReceipt,createCopyOperation,type Draft} from '../../frontend/src/lib/ai-panel-workflow.ts';
+import {ClientRequests} from '../../frontend/src/lib/client-workflow.ts';
 test('P6 database queue, review, clipboard receipts, feedback and external logging',async t=>{
  const db=new PGlite(),owner=crypto.randomUUID(),agent=crypto.randomUUID(),other=crypto.randomUUID(),req=()=>crypto.randomUUID(),options={language:'en',tone:'PROFESSIONAL',instruction:''} as const;
  try{
@@ -86,6 +88,21 @@ test('P6 database queue, review, clipboard receipts, feedback and external loggi
  });
  await t.test('audit failure rolls back edited text, clipboard completion and external message in their full transactions',async()=>{
   const lead=await create();let draft=await approve(await publish(lead));const auth=await action(draft,'COPY_AUTH');await db.exec('reset role');await db.exec(`create function public.fail_draft_audit() returns trigger language plpgsql as $$ begin if new.event_type in ('DRAFT_EDIT','DRAFT_COPIED','DRAFT_EXTERNAL_LOGGED') then raise exception 'AUDIT_UNAVAILABLE';end if;return new;end $$;create trigger fail_draft_audit before insert on public.activity_events for each row execute function public.fail_draft_audit();`);await as(owner);await assert.rejects(()=>action(draft,'EDIT',{text:'Must roll back'}),/AUDIT_UNAVAILABLE/);assert.equal((await db.query<any>('select working_text from public.reply_drafts where id=$1',[draft.id])).rows[0].working_text,draft.working_text);await assert.rejects(()=>action(draft,'COPY_DONE',{copy_token:auth.copy_token}),/AUDIT_UNAVAILABLE/);await db.exec('reset role');assert.equal((await db.query<any>('select completed_at from private.draft_copy_receipts where token=$1',[auth.copy_token])).rows[0].completed_at,null);await db.exec('drop trigger fail_draft_audit on public.activity_events');await as(owner);draft=(await action(draft,'COPY_DONE',{copy_token:auth.copy_token})).draft;await db.exec('reset role');await db.exec('create trigger fail_draft_audit before insert on public.activity_events for each row execute function public.fail_draft_audit()');await as(owner);await assert.rejects(()=>action(draft,'LOG_EXTERNAL',{expected_lead_version:lead.version,body:'Must not log',occurred_at:new Date(Date.now()-1000).toISOString(),sent_confirmed:true}),/AUDIT_UNAVAILABLE/);assert.equal((await db.query("select id from public.messages where lead_id=$1 and direction='OUTBOUND'",[lead.id])).rows.length,0);assert.equal((await db.query<any>('select version from public.leads where id=$1',[lead.id])).rows[0].version,lead.version);await db.exec('reset role');await db.exec('drop trigger fail_draft_audit on public.activity_events');
+ });
+ await t.test('AI client contracts consume actual SQL queue, review, feedback, copy and nested external receipts',async()=>{
+  const lead=await create(),queued=await rpc('submit_analysis',[tenant,lead.id,lead.version,req(),req()]);
+  assert.equal(validateAiReceipt(queued,`/api/v1/leads/${lead.id}/analyze`,{expected_version:lead.version},tenant,lead.id).jobId,queued.job_id);
+  const cancelled=await rpc('cancel_analysis',[tenant,queued.job_id,1,req(),req()]);assert.equal(validateAiReceipt(cancelled,`/api/v1/ai/jobs/${queued.job_id}/cancel`,{expected_version:1},tenant,lead.id).jobId,queued.job_id);
+  let d=await publish(lead);const edit={expected_version:d.version,text:'Please confirm your timeline.'};d=await action(d,'EDIT',{text:edit.text});validateAiReceipt(d,`/api/v1/drafts/${d.id}/edit`,edit,tenant,lead.id);
+  const review={expected_version:d.version,acknowledged:true};d=await approve(d);validateAiReceipt(d,`/api/v1/drafts/${d.id}/approve`,review,tenant,lead.id);
+  const feedback={expected_version:d.version,category:'USEFUL',comment:'Verified fixture'};const reported=await action(d,'FEEDBACK',{category:feedback.category,comment:feedback.comment});validateAiReceipt(reported,`/api/v1/drafts/${d.id}/feedback`,feedback,tenant,lead.id);
+  let copies=0;const copy=createCopyOperation(async(path,options,_tenant,key)=>rpc('mutate_draft',[tenant,d.id,path.endsWith('/copy')?'COPY_AUTH':'COPY_DONE',JSON.parse(options.body as string),key,req()]),tenant,lead.id,d as Draft,async()=>{copies++;});
+  const copied=await copy(new ClientRequests().capture(),req());d=copied.draft!;assert.equal(copies,1);assert.equal(d.state,'COPIED');
+  const input={expected_version:d.version,expected_lead_version:lead.version,body:'Actual external fixture',occurred_at:new Date(Date.now()-1000).toISOString(),sent_confirmed:true};const logged=await action(d,'LOG_EXTERNAL',{expected_lead_version:input.expected_lead_version,body:input.body,occurred_at:input.occurred_at,sent_confirmed:true});assert.equal(validateAiReceipt(logged,`/api/v1/drafts/${d.id}/external-message`,input,tenant,lead.id).leadVersion,lead.version+1);
+  const savedLead=(await db.query<any>('select to_jsonb(l) value from public.leads l where id=$1',[lead.id])).rows[0].value;
+  const jobs=(await db.query<any>("select to_jsonb(j) value from (select id,state,version,input_version,attempts,requested_at,failure_code,usage_state,observed_tokens from public.ai_jobs where lead_id=$1 and kind='DRAFT' order by requested_at desc,id desc) j",[lead.id])).rows.map(r=>r.value);
+  const rows=(await db.query<any>('select to_jsonb(d) value from public.reply_drafts d where lead_id=$1',[lead.id])).rows.map(r=>r.value);
+  validateAiHistory('drafts',{enabled:true,outreach_allowed:true,lead:savedLead,jobs,drafts:rows,next_cursor:null},tenant,lead.id);
  });
  }finally{await db.close();}
 });
