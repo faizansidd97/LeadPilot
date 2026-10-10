@@ -11,8 +11,8 @@ The interface is English. Customer inquiries can contain multilingual text; enab
 | Area | Status |
 | --- | --- |
 | P0–P7: foundation, CRM workflows, team, capture, AI modules and dashboard | Implemented and verified locally |
-| P8: hardening and release preparation | In progress; nineteen local slices verified, including client recovery and authenticator setup UX |
-| Latest complete local regression | 626/626 tests pass |
+| P8: hardening and release preparation | In progress; twenty local slices verified, including Facts/duplicate-review recovery and authenticator setup UX |
+| Latest complete local regression | 638/638 tests pass |
 | Backend and frontend type checks | Pass |
 | Constructed analysis / draft contract evaluations | 100 analysis cases and 56 draft cases pass |
 | Production build | Pass |
@@ -246,7 +246,7 @@ Staging checks, platform monitoring, private AI diagnostics and key-rotation too
 | API contracts | [API](docs/API.md) |
 | Supabase setup and verification | [Supabase setup](docs/SUPABASE_SETUP.md), [staging verification](docs/STAGING_VERIFICATION.md) |
 | Team, invitation and account behavior | [Team administration](docs/TEAM_ADMINISTRATION.md), [Auth recovery](docs/AUTH_RECOVERY.md) |
-| Capture and lead data | [Capture](docs/CAPTURE.md), [client recovery](docs/CLIENT_RECOVERY.md) |
+| Capture and lead data | [Capture](docs/CAPTURE.md), [client recovery](docs/CLIENT_RECOVERY.md), [facts recovery](docs/FACTS_RECOVERY.md) |
 | AI analysis and evaluations | [AI analysis](docs/AI_ANALYSIS.md), [analysis evaluation](docs/AI_EVALUATION.md) |
 | Reviewed drafts | [Reply drafts](docs/REPLY_DRAFTS.md), [draft evaluation](docs/REPLY_EVALUATION.md) |
 | Metrics | [Dashboard](docs/DASHBOARD.md) |
