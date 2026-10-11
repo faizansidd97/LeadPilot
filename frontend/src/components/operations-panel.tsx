@@ -1,27 +1,24 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useState} from 'react';
 import {requestApi} from '@/lib/api-client';
-import {operationsAlertLabels,type OperationsSnapshot} from '@leadpilot/backend/domain/operations';
+import {operationsAlertLabels} from '@leadpilot/backend/domain/operations';
 import AnalysisUsage from './analysis-usage';
+import {operationsWorkflow} from '@/lib/operations-workflow';
 const age=(seconds:number)=>seconds<60?`${seconds}s`:seconds<3600?`${Math.floor(seconds/60)}m`:`${Math.floor(seconds/3600)}h ${Math.floor(seconds%3600/60)}m`;
-export default function OperationsPanel({tenantId,owner,agencyVersion}:{tenantId:string;owner:boolean;agencyVersion:number}){
- const [snapshot,setSnapshot]=useState<{tenant:string;data:OperationsSnapshot}|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('');
- const generation=useRef(0),controller=useRef<AbortController|null>(null),refresh=useRef<()=>void>(()=>{});
+type Props={tenantId:string;owner:boolean;agencyVersion:number};
+export default function OperationsPanel(props:Props){return <ScopedOperations key={`${props.tenantId}:${props.owner}:${props.agencyVersion}`} {...props}/>;}
+function ScopedOperations({tenantId,owner,agencyVersion}:Props){
+ const [,render]=useState(0),[flow]=useState(()=>operationsWorkflow(tenantId,requestApi,()=>render(n=>n+1)));
  useEffect(()=>{
-  const current=++generation.current;setSnapshot(null);setError('');let loading=false;
-  const load=async()=>{if(loading)return;loading=true;setBusy(true);const abort=new AbortController();controller.current=abort;
-   try{const data:OperationsSnapshot=await requestApi('/api/v1/agency/operations',{signal:abort.signal},tenantId);if(current===generation.current){setSnapshot({tenant:tenantId,data});setError('');}}
-   catch(e){if(current===generation.current&&!abort.signal.aborted){setSnapshot(null);setError((e as Error).message);}}
-   finally{loading=false;if(current===generation.current)setBusy(false);}
-  };
-  refresh.current=()=>void load();void load();
-  const visible=()=>{if(document.visibilityState==='visible')void load();};const timer=window.setInterval(visible,60000);document.addEventListener('visibilitychange',visible);
-  return()=>{generation.current++;controller.current?.abort();window.clearInterval(timer);document.removeEventListener('visibilitychange',visible);};
- },[tenantId]);
- const data=snapshot?.tenant===tenantId?snapshot.data:null;
+  flow.activate();void flow.refresh();
+  const visible=()=>{if(document.visibilityState==='visible')void flow.refresh();};
+  const timer=window.setInterval(visible,60000);document.addEventListener('visibilitychange',visible);
+  return()=>{flow.close();window.clearInterval(timer);document.removeEventListener('visibilitychange',visible);};
+ },[flow]);
+ const {data,busy,error,loaded,denied}=flow.state;
  return <section className="settings-section" aria-label="Agency operations" aria-busy={busy}>
-  <div className="section-head"><div><h2>Operations status</h2><p>Agency queue snapshot. Updates every minute while this tab is visible.</p></div><button type="button" disabled={busy} onClick={()=>refresh.current()}>{busy?'Refreshing…':'Refresh status'}</button></div>
-  {error&&<p className="error" role="alert">{error}</p>}{busy&&!data&&<p role="status">Loading operations status…</p>}
+  <div className="section-head"><div><h2>Operations status</h2><p>Agency queue snapshot. Updates every minute while this tab is visible.</p></div><button type="button" disabled={busy||denied} onClick={()=>void flow.refresh()}>{busy?'Refreshing…':'Refresh status'}</button></div>
+  {error&&<p className="error" role="alert">{error}</p>}{busy&&!data&&<p role="status">Loading operations status…</p>}{!busy&&!loaded&&<p>Operations status is unavailable. Queue counts and alerts have not been verified.</p>}
   {data&&<>
    <p>Captured {new Date(data.captured_at).toLocaleString()}.</p>
    <aside className="record-facts" aria-label="Queue alerts">{data.alerts.length?<><h3>Needs attention</h3><ul>{data.alerts.map(code=><li key={code}>{operationsAlertLabels[code]}</li>)}</ul><p>Contact your operations team to review failures, scheduler configuration and uncertain AI usage.</p></>:<><h3>No queue alerts in this snapshot</h3><p>Live scheduler execution and delivery still need operational verification.</p></>}</aside>
@@ -32,6 +29,6 @@ export default function OperationsPanel({tenantId,owner,agencyVersion}:{tenantId
    </div>
    <p>Delay alerts start after 15 minutes. Failed jobs remain counted until recovered; this view does not retry jobs or change reservations. Provider cost has not been reconciled.</p>
   </>}
-  {owner&&data&&<AnalysisUsage key={tenantId} tenantId={tenantId} version={agencyVersion}/>}<p>Global monitoring and incident handling remain with your operations team.</p>
+  {owner&&data&&<AnalysisUsage key={`${tenantId}:${agencyVersion}`}  tenantId={tenantId} version={agencyVersion}/>}<p>Global monitoring and incident handling remain with your operations team.</p>
  </section>;
 }

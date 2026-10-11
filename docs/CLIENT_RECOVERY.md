@@ -106,3 +106,7 @@ Capture and Settings Integrations now use WEBSITE_INTEGRATION_RECOVERY.md. Confi
 ## Settings continuation
 
 Profile/team/invitations/agency/pilot/ownership workflows now use SETTINGS_RECOVERY.md. Atomic validated scope publication replaces partial Settings reads; acknowledged saves use reads only and recent-MFA requirements retain the original attempt. Private invitation links require matching fresh state and explicit clipboard reauthorization. Mounted helper tests compile the component but do not establish browser retention, signed Auth or concurrent acceptance.
+
+## Operations and owner usage continuation
+
+Operations and AI usage use OPERATIONS_RECOVERY.md. Scoped cancellable reads and synchronous gates hide unverified prior counts during refresh/failure, validate queue alerts/limits and distinguish unavailable from confirmed zero. Tenant/owner/version changes remount local state; denial clears it. Minute visibility polling performs reads only; these helpers do not establish scheduler delivery, provider cost, mounted accessibility or hosted acceptance.
