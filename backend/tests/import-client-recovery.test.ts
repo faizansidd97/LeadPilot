@@ -1,0 +1,83 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {ImportWorkflow,verifyImportSummary,verifyImportList,verifyImportDetail} from '../../frontend/src/lib/import-workflow.ts';
+import {mapCsv,CSV_MAX_BYTES} from '../src/domain/csv.ts';
+import {localDatabase,identity,rpc,seedPrivacyFixture} from './helpers/local-db.ts';
+const tenant=crypto.randomUUID(),id=crypto.randomUUID(),csv='full_name,email\nSynthetic Buyer,buyer@example.test',summary={id,state:'PREVIEW',total:1,created_at:'2026-10-01T00:00:00.000025Z',created:0,duplicate:0,invalid:0,failed:0,pending:1,retryable:0,create_separate:false,reason:null};
+const preview=mapCsv(csv,{full_name:'full_name',email:'email'})[0].payload;
+const row={row_index:1,state:'PENDING',errors:{},attempts:0,lead_id:null,preview,duplicate:false};
+const detail=(s:Record<string,unknown>=summary,rows:unknown[]=[row],cursor:number|null=null)=>({...s,rows,next_cursor:cursor});
+const list=(imports:unknown[]=[summary],cursor:string|null=null)=>({imports,next_cursor:cursor});
+const processed={...summary,state:'COMPLETE',created:1,pending:0,reason:''};
+const processedRow={...row,state:'CREATED',lead_id:crypto.randomUUID(),preview:null};
+const confirm={create_separate:false,reason:'',retry_failed:false};
+const bytes=(s:string)=>new TextEncoder().encode(s).buffer as ArrayBuffer;
+const file=(s=csv)=>({size:bytes(s).byteLength,arrayBuffer:async()=>bytes(s)});
+const wait=<T>()=>{let resolve!:(v:T)=>void;return {promise:new Promise<T>(r=>{resolve=r;}),resolve};};
+const fail=(status=503)=>Object.assign(Error('Synthetic failure'),{status});
+const encode=(v:unknown)=>Buffer.from(JSON.stringify(v)).toString('base64url');
+
+test('Import summary projects fields and rejects inconsistent counts, states, policies or receipt identity',()=>{
+ assert.equal('private_token' in verifyImportSummary({...summary,private_token:'hidden'}),false);
+ for(const change of [{total:0},{created:1},{retryable:2},{pending:1.1},{state:'UNKNOWN'},{state:'COMPLETE'},{reason:'x'.repeat(501)},{create_separate:true},{created_at:'bad'}])assert.throws(()=>verifyImportSummary({...summary,...change}));assert.throws(()=>verifyImportSummary(summary,crypto.randomUUID()));
+ assert.equal(verifyImportSummary(processed).created,1);
+});
+test('History validates precise descending timestamp/UUID order, bounded pages and last-row cursor',()=>{
+ const rows=Array.from({length:25},(_,i)=>({...summary,id:crypto.randomUUID(),created_at:`2026-10-01T00:00:00.${String(25-i).padStart(6,'0')}Z`})),last=rows.at(-1)!;assert.equal(verifyImportList(list(rows,encode({created_at:last.created_at,id:last.id}))).imports.length,25);
+ for(const cursor of [{created_at:new Date(last.created_at).toISOString(),id:last.id},{created_at:last.created_at,id:crypto.randomUUID()},{created_at:last.created_at,id:last.id,private:'hidden'}])assert.throws(()=>verifyImportList(list(rows,encode(cursor))));
+ assert.throws(()=>verifyImportList(list([summary,summary])));assert.throws(()=>verifyImportList(list([...rows].reverse())));assert.throws(()=>verifyImportList(list(Array(26).fill(summary))));assert.throws(()=>verifyImportList(list([summary]),verifyImportSummary(summary)));
+});
+test('Detail validates projected rows, contiguous paging, cursor completeness and unchanged progress across pages',()=>{
+ const s={...summary,total:21,pending:21},rows=Array.from({length:20},(_,i)=>({...row,row_index:i+1,raw_error:'hidden'})),first=verifyImportDetail(detail(s,rows,20),id);assert.equal('raw_error' in first.rows[0],false);const last=verifyImportDetail(detail(s,[{...row,row_index:21}]),id,20,first);assert.equal(last.rows.length,21);
+ for(const value of [detail(s,rows,null),detail(s,[{...row,row_index:2}],2),detail(s,rows,19),detail(s,Array(21).fill(row),20),detail(s,[{...row,errors:{private_token:'secret'}}],null)])assert.throws(()=>verifyImportDetail(value,id));assert.throws(()=>verifyImportDetail(detail({...s,state:'RUNNING',created:1,pending:20,reason:''},[{...processedRow,row_index:21}]),id,20,first));
+});
+test('Post-preview rows hide payloads and permit real retained retry errors without exposing unsupported fields',()=>{
+ assert.equal(verifyImportDetail(detail(processed,[processedRow]),id).rows[0].preview,null);assert.throws(()=>verifyImportDetail(detail(processed,[{...processedRow,preview}]),id));assert.throws(()=>verifyImportDetail(detail(processed,[{...processedRow,lead_id:null}]),id));
+ const running={...summary,state:'RUNNING',reason:''};assert.equal(verifyImportDetail(detail(running,[{...row,attempts:1,errors:{_row:'Previous write failed.'},preview:null}]),id).rows[0].attempts,1);
+ const invalid={...summary,pending:0,invalid:1};assert.equal(verifyImportDetail(detail(invalid,[{...row,state:'INVALID',errors:{'locations.0':'Use at most 120 characters.'},preview:null}]),id).invalid,1);
+});
+test('Unavailable history differs from empty and refresh/read/action gates reject same-frame duplicates',async()=>{
+ const waiting=wait<unknown>();let reads=0;const f=new ImportWorkflow(tenant,'OWNER',async()=>{reads++;return waiting.promise;},()=>{},()=>{});const loading=f.refresh();assert.equal(await f.refresh(),false);assert.equal(await f.file(file()),false);waiting.resolve(Promise.reject(fail()));await loading;assert.equal(f.state.listReady,false);assert.equal(reads,1);
+ const empty=new ImportWorkflow(tenant,'OWNER',async()=>list([]),()=>{},()=>{});await empty.refresh();assert.equal(empty.state.listReady,true);assert.equal(empty.state.imports.length,0);
+});
+test('Same-import read failure retains mounted selection and a read-only retry restores it',async()=>{
+ let reads=0;const f=new ImportWorkflow(tenant,'OWNER',async p=>p==='/api/v1/imports'?list():++reads===2?Promise.reject(fail()):detail(),()=>{},()=>{});await f.refresh();await f.select(id);await f.select(id);assert.equal(f.state.selected?.id,id);assert.equal(f.state.detailReady,false);assert.equal(f.state.listReady,false);await f.select(id);assert.equal(f.state.detailReady,true);assert.equal(reads,3);
+});
+test('New-file and close fences ignored-abort decoding and invalid UTF-8/size/authority columns remain rejected',async()=>{
+ const waiting=wait<ArrayBuffer>();const f=new ImportWorkflow(tenant,'OWNER',async()=>list(),()=>{},()=>{});const first=f.file({size:10,arrayBuffer:()=>waiting.promise});await f.file(file('full_name,email\nLatest Buyer,latest@example.test'));waiting.resolve(bytes(csv));await first;assert.match(f.state.csv,/Latest Buyer/);assert.equal(await f.file({size:CSV_MAX_BYTES+1,arrayBuffer:async()=>assert.fail('No read')}),false);assert.equal(f.state.csv,'');assert.equal(await f.file({size:1,arrayBuffer:async()=>new Uint8Array([255]).buffer}),false);assert.equal(await f.file(file('tenant_id,email\nforged,buyer@example.test')),false);assert.equal(await f.file(file('x'.repeat(121)+',email\nignored,buyer@example.test')),false);
+ const late=wait<ArrayBuffer>();const pending=f.file({size:10,arrayBuffer:()=>late.promise});f.close();late.resolve(bytes(csv));await pending;assert.equal(f.state.csv,'');assert.equal(await f.file(file()),false);
+});
+test('Prepare lost acknowledgement retains original CSV/mapping/key and clears input only after current reads',async()=>{
+ const writes:{body:string;key?:string}[]=[];const f=new ImportWorkflow(tenant,'OWNER',async(p,o,t,key)=>{if(o.method==='POST'){writes.push({body:String(o.body),key});if(writes.length===1)throw fail();return summary;}return p==='/api/v1/imports'?list():detail();},()=>{},()=>{});await f.file(file());await f.prepare();assert.equal(f.state.pending,'write');assert.equal(f.state.csv,csv);assert.equal(f.map('email','phone'),false);assert.equal(await f.file(file('different')),false);assert.equal(await f.prepare(),false);await f.recover();assert.deepEqual(writes[0],writes[1]);assert.equal(f.state.csv,'');assert.equal(f.state.headers.length,0);assert.equal(f.state.selected?.id,id);assert.equal(f.state.pending,null);
+});
+test('Known preview followed by failed detail refresh recovers with reads only and preserves file until success',async()=>{
+ let posts=0,reads=0;const f=new ImportWorkflow(tenant,'OWNER',async(p,o)=>{if(o.method==='POST'){posts++;return summary;}if(p==='/api/v1/imports')return list();if(++reads===1)throw fail();return detail();},()=>{},()=>{});await f.file(file());await f.prepare();assert.equal(f.state.pending,'refresh');assert.equal(f.state.csv,csv);await f.recover();assert.equal(posts,1);assert.equal(f.state.csv,'');assert.equal(f.state.detailReady,true);
+});
+test('Unknown process response reconciles with reads only and requires separate explicit reviewed-progress release',async()=>{
+ let posts=0,changed=0,done=false;const f=new ImportWorkflow(tenant,'OWNER',async(p,o)=>{if(o.method==='POST'){posts++;done=true;throw fail();}return p==='/api/v1/imports'?list([done?processed:summary]):done?detail(processed,[processedRow]):detail();},()=>{},()=>changed++);await f.refresh();await f.select(id);await f.process(confirm);assert.equal(f.state.pending,'inspect');assert.equal(f.state.hold,true);assert.equal(f.release(),false);await f.recover();assert.equal(posts,1);assert.equal(f.state.pending,null);assert.equal(f.state.hold,true);assert.equal(f.state.reviewed,true);assert.equal(await f.process(confirm),false);assert.equal(await f.refresh(),false);assert.equal(changed,0);await f.inspect();assert.equal(posts,1);assert.equal(f.release(),true);assert.equal(f.state.hold,false);assert.equal(f.state.selected?.created,1);
+});
+test('Known process acknowledgement with failed read recovery never repeats processing or changes confirmation',async()=>{
+ let posts=0,reads=0,changed=0,done=false;const f=new ImportWorkflow(tenant,'OWNER',async(p,o)=>{if(o.method==='POST'){posts++;done=true;return processed;}if(p==='/api/v1/imports')return list([done?processed:summary]);if(done&&++reads===1)throw fail();return done?detail(processed,[processedRow]):detail();},()=>{},()=>changed++);await f.refresh();await f.select(id);await f.process(confirm);assert.equal(f.state.pending,'refresh');assert.equal(f.state.hold,false);await f.recover();assert.equal(posts,1);assert.equal(changed,1);assert.equal(f.state.selected?.created,1);
+});
+test('Invalid/mismatched process receipts are uncertain while definitive input conflict permits correction without replay',async()=>{
+ for(const value of [{...processed,id:crypto.randomUUID()},{...processed,total:2,pending:1,state:'RUNNING'},summary,{...processed,reason:'Wrong policy'}]){const f=new ImportWorkflow(tenant,'OWNER',async(p,o)=>o.method==='POST'?value:p==='/api/v1/imports'?list():detail(),()=>{},()=>{});await f.refresh();await f.select(id);await f.process(confirm);assert.equal(f.state.pending,'inspect');assert.equal(f.state.hold,true);}
+ const f=new ImportWorkflow(tenant,'OWNER',async(p,o)=>{if(o.method==='POST')throw fail(409);return p==='/api/v1/imports'?list():detail();},()=>{},()=>{});await f.refresh();await f.select(id);await f.process(confirm);assert.equal(f.state.pending,null);assert.equal(f.state.hold,false);
+});
+test('Manager/authorization denial clears customer file and progress and prevents later actions',async()=>{
+ const agent=new ImportWorkflow(tenant,'AGENT',async()=>assert.fail('No manager API'),()=>{},()=>{});await agent.refresh();assert.equal(agent.state.denied,true);
+ let deny=false;const f=new ImportWorkflow(tenant,'OWNER',async()=>{if(deny)throw fail(403);return list();},()=>{},()=>{});await f.file(file());await f.refresh();deny=true;await f.refresh();assert.equal(f.state.denied,true);assert.equal(f.state.csv,'');assert.equal(f.state.imports.length,0);assert.equal(await f.prepare(),false);
+});
+test('Scope close/replay fences delayed preview/summary/detail callbacks and cannot reset newer file state',async()=>{
+ for(const phase of ['list','prepare','process']){const waiting=wait<unknown>();let changes=0,done=0;const f=new ImportWorkflow(tenant,'OWNER',async(p,o)=>{if(phase==='list'||o.method==='POST')return waiting.promise;return p==='/api/v1/imports'?list():detail();},()=>changes++,()=>done++);let operation:Promise<boolean>;if(phase==='list')operation=f.refresh();else if(phase==='prepare'){await f.file(file());operation=f.prepare();}else{await f.refresh();await f.select(id);operation=f.process(confirm);}f.close();const count=changes;waiting.resolve(phase==='list'?list():phase==='process'?processed:summary);await operation;assert.equal(changes,count);assert.equal(done,0);assert.equal(f.state.csv,'');assert.equal(f.state.selected,null);assert.equal(f.state.pending,null);}
+});
+test('Actual SQL 27-row process lost acknowledgement inspects first 25 and only a separately requested batch processes remaining two',async()=>{
+ const db=await localDatabase();try{const f=await seedPrivacyFixture(db);let posts=0,lost=true,changed=0;async function transport(p:string,o:RequestInit,t:string,key?:string){const u=new URL(p,'https://fixture.test');if(p==='/api/v1/imports'&&o.method==='POST'){const b=JSON.parse(String(o.body));return rpc(db,'prepare_lead_import',[t,mapCsv(b.csv,b.mapping),key,crypto.randomUUID()]);}if(p.endsWith('/process')){posts++;const b=JSON.parse(String(o.body)),result=await rpc(db,'process_lead_import',[t,p.split('/')[4],{create_separate:b.create_separate,reason:b.reason},b.retry_failed,crypto.randomUUID()]);if(lost){lost=false;throw fail();}return result;}if(u.pathname==='/api/v1/imports'){const c=u.searchParams.get('cursor')?JSON.parse(Buffer.from(u.searchParams.get('cursor')!,'base64url').toString('utf8')):null;const results=await rpc(db,'list_lead_imports',[t,c?.created_at??null,c?.id??null,26]),rows=results.slice(0,25);return list(rows,results.length>25?encode({created_at:rows.at(-1).created_at,id:rows.at(-1).id}):null);}const result=await rpc(db,'lead_import_detail',[t,u.pathname.split('/').at(-1),Number(u.searchParams.get('after')??0),21]),rows=result.rows.slice(0,20);return {...result,rows,next_cursor:result.rows.length>20?rows.at(-1).row_index:null};}
+ const flow=new ImportWorkflow(f.agency.id,'OWNER',transport,()=>{},()=>changed++);const csv27='full_name,email\n'+Array.from({length:27},(_,i)=>`Import Buyer ${i},import${i}@example.test`).join('\n');await flow.file(file(csv27));await flow.prepare();assert.equal(flow.state.detailReady,true);const importId=flow.state.selected!.id;await flow.select(importId,true);assert.equal(flow.state.selected?.rows.length,27);await flow.process(confirm);assert.equal(flow.state.pending,'inspect');await flow.recover();assert.equal(posts,1);assert.equal(flow.state.selected?.created,25);assert.equal(flow.state.selected?.pending,2);assert.equal(changed,0);assert.equal(flow.release(),true);await flow.process(confirm);assert.equal(posts,2);assert.equal(flow.state.selected?.created,27);assert.equal(flow.state.selected?.state,'COMPLETE');assert.equal(changed,1);assert.equal((await db.query<any>("select count(*)::int n from public.leads where email like 'import%@example.test'")).rows[0].n,27);
+ await identity(db,f.agent);await assert.rejects(()=>rpc(db,'lead_import_detail',[f.agency.id,importId,0,20]),/ROLE_REQUIRED/);await identity(db,f.other);await assert.rejects(()=>rpc(db,'lead_import_detail',[f.foreign.id,importId,0,20]),/NOT_FOUND/);
+ }finally{await db.close();}
+});
+test('Actual SQL prepare replay is unique and audit rollback leaves process progress unchanged for read-only reconciliation',async()=>{
+ const db=await localDatabase();try{const f=await seedPrivacyFixture(db),payload=mapCsv(csv,{full_name:'full_name',email:'email'}),key=crypto.randomUUID();const prepared=await rpc(db,'prepare_lead_import',[f.agency.id,payload,key,crypto.randomUUID()]);assert.equal((await rpc(db,'prepare_lead_import',[f.agency.id,payload,key,crypto.randomUUID()])).id,prepared.id);await db.exec('reset role');assert.equal((await db.query<any>('select count(*)::int n from private.lead_imports where request_key=$1',[key])).rows[0].n,1);await db.exec("create function public.fail_csv_recovery_audit() returns trigger language plpgsql as $$ begin raise exception 'AUDIT_FAIL';end $$;create trigger fail_csv_recovery_audit before insert on public.activity_events for each row execute function public.fail_csv_recovery_audit();");await identity(db,f.owner);
+ await assert.rejects(()=>rpc(db,'process_lead_import',[f.agency.id,prepared.id,{create_separate:false,reason:''},false,crypto.randomUUID()]),/AUDIT_FAIL/);const result=await rpc(db,'lead_import_detail',[f.agency.id,prepared.id,0,21]);const checked=verifyImportDetail({...result,next_cursor:null},prepared.id);assert.equal(checked.state,'PREVIEW');assert.equal(checked.pending,1);assert.equal((await db.query<any>("select count(*)::int n from public.leads where email='buyer@example.test'")).rows[0].n,0);
+ }finally{await db.close();}
+});

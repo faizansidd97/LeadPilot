@@ -1,0 +1,12 @@
+import {z} from 'zod';
+import {captureLeadSchema,csvColumns,importConfirmSchema} from './capture.ts';
+const count=z.number().int().min(0).max(1000);
+export const importSummarySchema=z.object({id:z.uuid(),state:z.enum(['PREVIEW','RUNNING','COMPLETE']),total:z.number().int().min(1).max(1000),created_at:z.iso.datetime({offset:true}),created:count,duplicate:count,invalid:count,failed:count,pending:count,retryable:count,create_separate:z.boolean(),reason:z.string().max(500).nullable()}).refine(v=>v.total===v.created+v.duplicate+v.invalid+v.failed+v.pending&&v.retryable<=v.failed&&(v.state==='COMPLETE'?v.pending===0:v.state==='RUNNING'?v.pending>0:v.created===0&&v.duplicate===0&&v.failed===0)&&(!v.create_separate||(v.reason?.trim().length??0)>=5),'Import totals could not be verified.');
+export type ImportSummary=z.infer<typeof importSummarySchema>;
+const errors=z.record(z.string().max(120).refine(k=>k==='_row'||csvColumns.some(c=>k===c||k.startsWith(c+'.')&&/^\d+$/.test(k.slice(c.length+1)))),z.string().min(1).max(2000)).refine(v=>JSON.stringify(v).length<=4000);
+const preview=captureLeadSchema.safeExtend({assignee_email:z.string().max(254).default('')});
+export const importRowSchema=z.object({row_index:z.number().int().min(1).max(1000),state:z.enum(['PENDING','CREATED','DUPLICATE','INVALID','FAILED']),errors,attempts:z.number().int().min(0).max(3),lead_id:z.uuid().nullable(),preview:preview.nullable(),duplicate:z.boolean()}).refine(v=>(v.state==='CREATED'?v.lead_id!==null:v.lead_id===null)&&(['FAILED','INVALID'].includes(v.state)?Object.keys(v.errors).length>0:v.state==='CREATED'||v.attempts===0?Object.keys(v.errors).length===0:true)&&(!(v.state==='FAILED')||v.attempts>=1),'Import row could not be verified.');
+export const importListSchema=z.object({imports:z.array(importSummarySchema).max(25),next_cursor:z.string().min(1).max(512).nullable()});
+export const processImportSchema=importConfirmSchema.safeExtend({retry_failed:z.boolean().default(false)});
+export type ImportRow=z.infer<typeof importRowSchema>;
+export type ImportDetail=ImportSummary&{rows:ImportRow[];next_cursor:number|null};
