@@ -1,0 +1,31 @@
+# Delivery status and remaining work
+
+Reviewed on 12 October 2026 (final local verification recorded 11 October UTC). User direction: complete local development now; separate staging hosting/domain are not yet available. This report separates executable local implementation from unresolved policy, real-environment evidence and later commercial scope. It does not accept a release.
+
+## Implemented locally
+
+P0–P7 implementation is preserved: authenticated agencies/team/MFA, leads and lifecycle, conversations/revisions, follow-ups/notifications, manual/CSV/signed website capture, confirmed facts/duplicates, optional evidence-backed AI, reviewed replies and operational dashboard. P8 adds privacy request/review/holds/partial impact, security/role/read safeguards, durable worker/monitoring preparation, key rotation/restore tests and client recovery across the implemented workflows.
+
+The final client recovery pass includes Settings profile/team/invitation/agency/pilot/owner transfer and Operations/owner AI usage. Original uncertain Settings saves keep their original payload/key; acknowledged writes recover with reads only. Private links require current matching invitation state. Queue and usage refreshes hide unverified counts and fence duplicate/late reads. See SETTINGS_RECOVERY.md and OPERATIONS_RECOVERY.md.
+
+Final full local verification passes 796/796 regressions, both package type checks, 100 analysis/56 draft constructed contracts and production build. LOCAL_CHECKS.json is the authoritative generated source/check record. RELEASE_EVIDENCE.md records counts, runtime, fingerprint and limitations; DEPENDENCY_AUDIT.json records the separate point-in-time advisory result for the lock file. These are synthetic/local compiler/database checks, not live-provider quality or hosted/browser sign-off. Schema remains 001–023 and development stays on localhost:4000. No new migration or key is needed for the final recovery changes.
+
+## Remaining dependencies in order
+
+| Step | Concrete remaining work | Required input / existing preparation |
+| --- | --- | --- |
+| 1. Privacy implementation (A22) | Implement approved complete erasure/closure, private/external child handling, fencing and deletion replay after restore; currently unavailable | D02/D03 policy decisions in PRIVACY_POLICY_REQUIREMENTS.md. Existing case intake/review and partial impact are not the executor. Local development can resume on this dependency before hosting once approved requirements are supplied. |
+| 2. Staging environment | Separate approved tier/regions, HTTPS domain, Auth/email/MFA configuration, selected providers and deployed protected scheduler/monitoring | User confirms hosting/domain are not ready. STAGING_VERIFICATION.md and RUNBOOKS.md prepare checks; existing development credentials do not establish a separate staged candidate. |
+| 3. Hosted acceptance (A01–A24) | Two agencies with owner/admin/two agents and a differently scoped shared user; signed Auth/UI/API/direct-RLS attempts, delayed/revoked/failed work and audit evidence | RELEASE_CHECKLIST.md has the acceptance matrix. One agency and local emulated Auth do not satisfy this step; hosted testing was deferred. |
+| 4. Performance, backups and UI | Real concurrent 10k/50 reference workload, HTTP/UI/provider timing, selected-tier RPO/RTO/restore/deletion replay, responsive/keyboard/screen-reader/error journeys | Approve D09 targets/tier; record actual topology and reviewer. Existing sequential SQL benchmark and isolated dump/load are partial evidence. Browser permission restrictions remain in force. |
+| 5. Optional AI acceptance | Processing/rubric/languages/provider approvals, at least 100 approved inquiry evaluations and bilingual suggestion review, actual charge/latency reconciliation | AI_EVALUATION.md and REPLY_EVALUATION.md contain constructed contracts only. Manual CRM can be evaluated with AI disabled; never mark the AI quality gate passed by disabling it. |
+| 6. Concrete release review | Exact staged revision/URL, accepted evidence/deviations, operator, migrations/secrets inventory and rollback procedure; deployment approval for that candidate | RELEASE_CHECKLIST.md and RUNBOOKS.md. No deployment or human acceptance is recorded. |
+| 7. Controlled pilot (P9) | Partners/data agreement, two baseline weeks, training, at least four pilot weeks, weekly review and expand/fix/stop decision | PILOT_PROTOCOL.md includes metric denominators and a blank weekly record. Actual use and willingness-to-pay evidence from two agencies cannot be manufactured in development. |
+
+P8 remains IN PROGRESS / release NOT_READY. P9 is PREPARED, NOT STARTED. P10–P11 remain future scope: validated pilot demand and concrete pricing/payment/channel/provider/tax/refund/access/scale decisions precede billing, official channel adapters and expansion. Broad “complete the plan” does not establish those missing product choices or observed pilot results.
+
+## Audit result and next local dependency
+
+The reviewed source has no advertised execution route behind the Privacy “unavailable” notice. That is an explicit missing policy-dependent feature, not a passing test claim. Current impact counts omit private/provider/backup dependencies, as documented. The next implementation dependency is the approved privacy policy and full inventory/restore protocol. Remaining hosted acceptance is intentionally deferred until separate staging and permitted test access exist.
+
+No arbitrary price, retention period, provider, region, automated sending or release percentage was selected. The current phase report and future roadmap remain in PRODUCT_PLAN.md. This preparation is complete as a document; it does not complete the real release or pilot.

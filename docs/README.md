@@ -10,6 +10,8 @@ Development baseline: LP BRD 001 and LP FSD 001, version 1.0, 5 October 2026, in
 
 The start-to-end roadmap and execution tracker are in [PRODUCT_PLAN.md](PRODUCT_PLAN.md). Continue in dependency order and track actual local, hosted and release evidence separately.
 
+The current handoff is in [DELIVERY_STATUS.md](DELIVERY_STATUS.md). Remaining privacy decisions are in [PRIVACY_POLICY_REQUIREMENTS.md](PRIVACY_POLICY_REQUIREMENTS.md), and the prepared baseline/training/weekly pilot protocol is in [PILOT_PROTOCOL.md](PILOT_PROTOCOL.md). These documents do not claim release or pilot completion.
+
 ## Folder structure
 
 
