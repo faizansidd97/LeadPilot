@@ -1,0 +1,4454 @@
+{
+  "generated_at": "2026-10-11T19:13:06.555Z",
+  "engine": "Isolated PGlite; emulated Auth references only",
+  "node": "v24.19.0",
+  "migrations": {
+    "files": [
+      "202610060001_foundation.sql",
+      "202610060002_services.sql",
+      "202610060003_lead_update.sql",
+      "202610060004_workflows.sql",
+      "202610060005_lead_controls.sql",
+      "202610060006_team.sql",
+      "202610060007_notifications.sql",
+      "202610060008_capture.sql",
+      "202610060009_imports.sql",
+      "202610060010_website_intake.sql",
+      "202610070011_analysis.sql",
+      "202610070012_drafts.sql",
+      "202610070013_dashboard.sql",
+      "202610070014_hardening.sql",
+      "202610070015_intake_key_rotation.sql",
+      "202610070016_invitation_key_rotation.sql",
+      "202610070017_intake_signing_roots.sql",
+      "202610080018_agency_operations.sql",
+      "202610080019_platform_health.sql",
+      "202610080020_ai_attempt_tracking.sql",
+      "202610100021_read_membership.sql",
+      "202610100022_privacy_impact.sql",
+      "202610100023_team_email_type.sql"
+    ],
+    "sha256": "7de08a821c4eece307805b0507cacfd56e46298826722fcb5a8e811b04816cba"
+  },
+  "format_version": 1,
+  "scope": "LOCAL_SCHEMA_METADATA_ONLY",
+  "catalog_coverage_complete": true,
+  "inventory_complete": false,
+  "retention_policy_approved": false,
+  "execution_available": false,
+  "coverage": {
+    "relations": 40,
+    "tables": 39,
+    "views": 1,
+    "missing": [],
+    "unclassified": [],
+    "changed": []
+  },
+  "external_dependencies": [
+    {
+      "description": "Hosted Auth accounts, sessions, MFA and provider storage beyond the emulated fixture",
+      "status": "NOT_INSPECTED"
+    },
+    {
+      "description": "Provider and mail transport copies, traces and charge reconciliation",
+      "status": "NOT_INSPECTED"
+    },
+    {
+      "description": "Backup snapshots, retained key rings and independent restored-deletion manifest",
+      "status": "NOT_INSPECTED"
+    },
+    {
+      "description": "Application, platform, support and external monitoring logs",
+      "status": "NOT_INSPECTED"
+    },
+    {
+      "description": "Operator files, CSV uploads, exports, clipboard/browser state and customer channels",
+      "status": "NOT_INSPECTED"
+    },
+    {
+      "description": "Function bodies, expression/index/extension storage and deployment-specific schema changes",
+      "status": "NOT_INSPECTED"
+    }
+  ],
+  "relations": [
+    {
+      "name": "private.ai_context",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "job_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "snapshot",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "snapshot_hash",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "ai_context_job_id_fkey",
+          "columns": [
+            "job_id"
+          ],
+          "target": "public.ai_jobs",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "ai_context_pkey",
+          "kind": "p",
+          "columns": [
+            "job_id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "AI processing, evidence and replies",
+        "scope": "Tenant or job-parent scope",
+        "review": "Fence active/late processing; inspect private input/output, provider copies and uncertain usage."
+      },
+      "schema_sha256": "1136df64bf8618809bc6cbdd62ca3918b9ba38ebeece3afe9d57ce2f1c50f8bf",
+      "opaque_columns": [
+        "snapshot"
+      ]
+    },
+    {
+      "name": "private.ai_policy",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "singleton",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "prompt_version",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "schema_version",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "rubric_approved",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "languages",
+          "type": "text[]",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "ai_policy_pkey",
+          "kind": "p",
+          "columns": [
+            "singleton"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Platform policy",
+        "scope": "Shared platform configuration",
+        "review": "Shared configuration is not a tenant deletion target; review operational retention separately."
+      },
+      "schema_sha256": "626fdb55d8e7ad0243335969b97310efce0b462b7a9e3c6405942412b09cf4ef",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.ai_policy_events",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "request_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "ai_policy_events_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Platform policy",
+        "scope": "Shared platform configuration",
+        "review": "Shared configuration is not a tenant deletion target; review operational retention separately."
+      },
+      "schema_sha256": "91a1436c081676d537940b094f7613221898e6b3eb9546e2a6616552fed6271c",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.ai_provider_attempts",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "job_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "claim_attempt",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "provider_request_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "prepared_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "ai_provider_attempts_job_id_fkey",
+          "columns": [
+            "job_id"
+          ],
+          "target": "public.ai_jobs",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "ai_provider_attempts_pkey",
+          "kind": "p",
+          "columns": [
+            "job_id",
+            "claim_attempt"
+          ]
+        },
+        {
+          "name": "ai_provider_attempts_provider_request_id_key",
+          "kind": "u",
+          "columns": [
+            "provider_request_id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "AI processing, evidence and replies",
+        "scope": "Tenant or job-parent scope",
+        "review": "Fence active/late processing; inspect private input/output, provider copies and uncertain usage."
+      },
+      "schema_sha256": "227546e5c2f34f625db725fbb67864d733d8b07432ce57832317b1d8824945de",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.ai_submission_limits",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "hour_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "count",
+          "type": "integer",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "ai_submission_limits_actor_id_fkey",
+          "columns": [
+            "actor_id"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "ai_submission_limits_pkey",
+          "kind": "p",
+          "columns": [
+            "actor_id",
+            "hour_at"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Shared actor limits",
+        "scope": "Cross-tenant Auth actor",
+        "review": "Do not remove another agency's actor state or Auth account through one agency closure."
+      },
+      "schema_sha256": "4733c4ed4fdc2dd6550b580251a2fb63fdaf13f525cf51f8105bac543dc3b04a",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.ai_usage_windows",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "period_at",
+          "type": "date",
+          "nullable": false
+        },
+        {
+          "name": "operations",
+          "type": "integer",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "ai_usage_windows_tenant_id_fkey",
+          "columns": [
+            "tenant_id"
+          ],
+          "target": "public.agencies",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "ai_usage_windows_pkey",
+          "kind": "p",
+          "columns": [
+            "tenant_id",
+            "kind",
+            "period_at"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Usage reservations and accounting",
+        "scope": "Tenant aggregate; not individual lead attribution",
+        "review": "Resolve uncertain provider usage; a current aggregate is not a per-lead deletion target."
+      },
+      "schema_sha256": "5126287f44f7d56c31a04e7242c0b7adad3d5e863ce508248efada26e2c12c7f",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.api_requests",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "operation",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "request_key",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "payload_hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "response",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "api_requests_pkey",
+          "kind": "p",
+          "columns": [
+            "actor_id",
+            "operation",
+            "request_key"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Private worker payload and replay",
+        "scope": "Tenant plus opaque entity/operation/payload links",
+        "review": "Inspect indirect/JSON references and late jobs; do not delete an entire tenant queue for one lead."
+      },
+      "schema_sha256": "3a9b2318f9a454de5f7586e956b86f52e4c8e27dd02beede3cd65caee09664f1",
+      "opaque_columns": [
+        "response"
+      ]
+    },
+    {
+      "name": "private.draft_copy_receipts",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "token",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "draft_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "content_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "draft_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "draft_copy_receipts_actor_id_fkey",
+          "columns": [
+            "actor_id"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "draft_copy_receipts_tenant_id_draft_id_fkey",
+          "columns": [
+            "tenant_id",
+            "draft_id"
+          ],
+          "target": "public.reply_drafts",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "draft_copy_receipts_pkey",
+          "kind": "p",
+          "columns": [
+            "token"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "AI processing, evidence and replies",
+        "scope": "Tenant or job-parent scope",
+        "review": "Fence active/late processing; inspect private input/output, provider copies and uncertain usage."
+      },
+      "schema_sha256": "ab0255e8d24634eda83885ce383a49f4f647550d6103b9c5f4d6cbcb5e63ac69",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.draft_policy",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "singleton",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "draft_policy_pkey",
+          "kind": "p",
+          "columns": [
+            "singleton"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Platform policy",
+        "scope": "Shared platform configuration",
+        "review": "Shared configuration is not a tenant deletion target; review operational retention separately."
+      },
+      "schema_sha256": "d8a25d21f6d57cbfc4716ad85d93febef5697a6de5f6dad53892798afb1bef1c",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.due_candidates",
+      "kind": "v",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "task_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "schedule_version",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "due_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "recipient_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "job_key",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "notice_key",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [],
+      "triggers": [],
+      "dependencies": [
+        "auth.users",
+        "public.follow_ups",
+        "public.leads",
+        "public.memberships"
+      ],
+      "policies": [],
+      "review": {
+        "category": "Derived scanner view",
+        "scope": "Derived tenant/lead/task/recipient rows",
+        "review": "No stored view rows to purge; verify underlying records and processing fences."
+      },
+      "schema_sha256": "90743f62a3d970ae07a5ae72a5be040629c85a374f86bb5ced9c77fab7817c6e",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.intake_encryption_operations",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "request_key",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "operation",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "payload_hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "response",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "reference",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "request_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "intake_encryption_operations_pkey",
+          "kind": "p",
+          "columns": [
+            "request_key"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Signing/encryption issuance and operation evidence",
+        "scope": "Tenant issuance or opaque global operation",
+        "review": "Review original receipts/operator references and historical key/backup dependencies; never infer a safe key retirement."
+      },
+      "schema_sha256": "57d5778b26a01586aee2640a5ff0db335ece539ff0887c336c2252f5355c046a",
+      "opaque_columns": [
+        "response"
+      ]
+    },
+    {
+      "name": "private.intake_encryption_policy",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "singleton",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "key_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "intake_encryption_policy_pkey",
+          "kind": "p",
+          "columns": [
+            "singleton"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Platform policy",
+        "scope": "Shared platform configuration",
+        "review": "Shared configuration is not a tenant deletion target; review operational retention separately."
+      },
+      "schema_sha256": "3f8e77148bd8661a73b5a5ec10b090662a9d28454857bae6cce6001d5efc36fd",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.intake_events",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "integration_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "external_event_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "body_hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "intake_events_tenant_id_integration_id_fkey",
+          "columns": [
+            "tenant_id",
+            "integration_id"
+          ],
+          "target": "private.website_integrations",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "intake_events_tenant_id_lead_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id"
+          ],
+          "target": "public.leads",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "intake_events_pkey",
+          "kind": "p",
+          "columns": [
+            "integration_id",
+            "external_event_id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Website intake and encrypted credentials",
+        "scope": "Tenant or integration parent",
+        "review": "Review captured event provenance, revoke access as approved and preserve required backup/key dependencies."
+      },
+      "schema_sha256": "83f4f0cb97b1797b759336392a7f6cba46e13e577dba28d6ce07469fccebbb96",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.intake_limits",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "integration_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "window_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "count",
+          "type": "integer",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "intake_limits_integration_id_fkey",
+          "columns": [
+            "integration_id"
+          ],
+          "target": "private.website_integrations",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "intake_limits_pkey",
+          "kind": "p",
+          "columns": [
+            "integration_id",
+            "window_at"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Website intake and encrypted credentials",
+        "scope": "Tenant or integration parent",
+        "review": "Review captured event provenance, revoke access as approved and preserve required backup/key dependencies."
+      },
+      "schema_sha256": "1c0afeccc9bd2488c534f1fed4639e5ebcc1fb9848d8a1749eed840dc97e11af",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.intake_signing_issuances",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "operation",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "request_key",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "integration_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "key_id",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "intake_signing_issuances_pkey",
+          "kind": "p",
+          "columns": [
+            "actor_id",
+            "operation",
+            "request_key"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Signing/encryption issuance and operation evidence",
+        "scope": "Tenant issuance or opaque global operation",
+        "review": "Review original receipts/operator references and historical key/backup dependencies; never infer a safe key retirement."
+      },
+      "schema_sha256": "a49e79546af71895b354f33df509c89ca064617ea82629573a47c4a6093a248c",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.intake_signing_operations",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "request_key",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "payload_hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "response",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "reference",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "request_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "intake_signing_operations_pkey",
+          "kind": "p",
+          "columns": [
+            "request_key"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Signing/encryption issuance and operation evidence",
+        "scope": "Tenant issuance or opaque global operation",
+        "review": "Review original receipts/operator references and historical key/backup dependencies; never infer a safe key retirement."
+      },
+      "schema_sha256": "85af3e0c3335aa5f11d4ac6e55b400f6059211cc31f253e56c5de0e070d7241e",
+      "opaque_columns": [
+        "response"
+      ]
+    },
+    {
+      "name": "private.intake_signing_policy",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "singleton",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "key_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "intake_signing_policy_pkey",
+          "kind": "p",
+          "columns": [
+            "singleton"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Platform policy",
+        "scope": "Shared platform configuration",
+        "review": "Shared configuration is not a tenant deletion target; review operational retention separately."
+      },
+      "schema_sha256": "f57f4a913ae44d3ecf4bc28a3dbc1f3a4c35a9a7d824a0650cb975cfb00359b0",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.invitation_issuances",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "operation",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "request_key",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "invitation_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "key_id",
+          "type": "text",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "invitation_issuances_pkey",
+          "kind": "p",
+          "columns": [
+            "actor_id",
+            "operation",
+            "request_key"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Signing/encryption issuance and operation evidence",
+        "scope": "Tenant issuance or opaque global operation",
+        "review": "Review original receipts/operator references and historical key/backup dependencies; never infer a safe key retirement."
+      },
+      "schema_sha256": "98f54e2bad9dbccd5ef19099f9afce1d663a972d1e64a825aae9c962395b272b",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.invitation_signing_operations",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "request_key",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "payload_hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "response",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "reference",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "request_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "invitation_signing_operations_pkey",
+          "kind": "p",
+          "columns": [
+            "request_key"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Signing/encryption issuance and operation evidence",
+        "scope": "Tenant issuance or opaque global operation",
+        "review": "Review original receipts/operator references and historical key/backup dependencies; never infer a safe key retirement."
+      },
+      "schema_sha256": "5d1c0e30683bd00f02fdb01a9874ddc4f1172f36c513803f3aecd0924acd4309",
+      "opaque_columns": [
+        "response"
+      ]
+    },
+    {
+      "name": "private.invitation_signing_policy",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "singleton",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "key_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "invitation_signing_policy_pkey",
+          "kind": "p",
+          "columns": [
+            "singleton"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Platform policy",
+        "scope": "Shared platform configuration",
+        "review": "Shared configuration is not a tenant deletion target; review operational retention separately."
+      },
+      "schema_sha256": "aa9a519e0c9521e10dda5a3e661d7dc5f1da59d40c8b7553084ef4507b21903d",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.lead_import_rows",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "import_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "row_index",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "nullable": true
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "errors",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "attempts",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "lead_import_rows_tenant_id_import_id_fkey",
+          "columns": [
+            "tenant_id",
+            "import_id"
+          ],
+          "target": "private.lead_imports",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "lead_import_rows_tenant_id_lead_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id"
+          ],
+          "target": "public.leads",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "lead_import_rows_pkey",
+          "kind": "p",
+          "columns": [
+            "import_id",
+            "row_index"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Import content and progress",
+        "scope": "Tenant; rows may have no saved lead yet",
+        "review": "Review pending/invalid/duplicate payloads and errors; lead_id alone does not find all matching inquiry content."
+      },
+      "schema_sha256": "31cd9c27b1af8dcb9418c58d9e8d60db712d2b9dfd1fcac18845dfb521baabec",
+      "opaque_columns": [
+        "payload",
+        "errors"
+      ]
+    },
+    {
+      "name": "private.lead_imports",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "request_key",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "payload_hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "total",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "create_separate",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "lead_imports_actor_id_fkey",
+          "columns": [
+            "actor_id"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "lead_imports_tenant_id_fkey",
+          "columns": [
+            "tenant_id"
+          ],
+          "target": "public.agencies",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "lead_imports_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "lead_imports_tenant_id_actor_id_request_key_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "actor_id",
+            "request_key"
+          ]
+        },
+        {
+          "name": "lead_imports_tenant_id_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Import content and progress",
+        "scope": "Tenant; rows may have no saved lead yet",
+        "review": "Review pending/invalid/duplicate payloads and errors; lead_id alone does not find all matching inquiry content."
+      },
+      "schema_sha256": "f9e08f8180f2fbc0e5b521e8b7c7bdb0730d6d280ea9461c50f37fd7055fbb73",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.outbox_events",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "event_type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "entity_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "payload",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "dedupe_key",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "attempts",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "lease_token",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "lease_until",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "last_error_code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "recipient_cursor",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "emitted_count",
+          "type": "integer",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "outbox_events_tenant_id_fkey",
+          "columns": [
+            "tenant_id"
+          ],
+          "target": "public.agencies",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "outbox_events_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "outbox_events_tenant_id_dedupe_key_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "dedupe_key"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Private worker payload and replay",
+        "scope": "Tenant plus opaque entity/operation/payload links",
+        "review": "Inspect indirect/JSON references and late jobs; do not delete an entire tenant queue for one lead."
+      },
+      "schema_sha256": "184689bfe8e4c78bd285a13108322e84db29def40ff1e0c9c8006e47a6ca7d74",
+      "opaque_columns": [
+        "payload"
+      ]
+    },
+    {
+      "name": "private.request_limits",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "window_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "count",
+          "type": "integer",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "request_limits_actor_id_fkey",
+          "columns": [
+            "actor_id"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "request_limits_pkey",
+          "kind": "p",
+          "columns": [
+            "actor_id",
+            "kind",
+            "window_at"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Shared actor limits",
+        "scope": "Cross-tenant Auth actor",
+        "review": "Do not remove another agency's actor state or Auth account through one agency closure."
+      },
+      "schema_sha256": "7e8a449b013ca19fa9a30271b86611ecf3bf9055fd153c726f516b3825bf3355",
+      "opaque_columns": []
+    },
+    {
+      "name": "private.website_integrations",
+      "kind": "r",
+      "rls": false,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "default_assignee_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "key_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "secret_cipher",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "secret_aad",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "secret_hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "encryption_key_id",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "encryption_revision",
+          "type": "integer",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "website_integrations_created_by_fkey",
+          "columns": [
+            "created_by"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "website_integrations_tenant_id_default_assignee_id_fkey",
+          "columns": [
+            "tenant_id",
+            "default_assignee_id"
+          ],
+          "target": "public.memberships",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "website_integrations_tenant_id_fkey",
+          "columns": [
+            "tenant_id"
+          ],
+          "target": "public.agencies",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "website_integrations_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "website_integrations_tenant_id_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [],
+      "review": {
+        "category": "Website intake and encrypted credentials",
+        "scope": "Tenant or integration parent",
+        "review": "Review captured event provenance, revoke access as approved and preserve required backup/key dependencies."
+      },
+      "schema_sha256": "db6c6e66eaa1c2b61666019d2b536eea9092df9037d7b0926db00c073d57f2ef",
+      "opaque_columns": []
+    },
+    {
+      "name": "public.activity_events",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "event_type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "request_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "details",
+          "type": "jsonb",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "activity_events_actor_id_fkey",
+          "columns": [
+            "actor_id"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "activity_events_tenant_id_lead_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id"
+          ],
+          "target": "public.leads",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "activity_tenant_fk",
+          "columns": [
+            "tenant_id"
+          ],
+          "target": "public.agencies",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "activity_events_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "activity_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        },
+        {
+          "name": "agency_activity_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        },
+        {
+          "name": "verified_activity_read",
+          "command": "SELECT",
+          "permissive": "RESTRICTIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "Audit and privacy review evidence",
+        "scope": "Tenant; some events have no lead reference",
+        "review": "Review reasons/details/verification references and minimized justified evidence; no blanket audit exemption."
+      },
+      "schema_sha256": "d5ac5ede0ce39d418d76c3a4259c8992ac04323527ae4ab08b73cf9865036fe0",
+      "opaque_columns": [
+        "details"
+      ]
+    },
+    {
+      "name": "public.agencies",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "timezone",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "locale",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "ai_enabled",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "seat_limit",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "ai_monthly_limit",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "processing_approved",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "processing_reference",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "ai_daily_limit",
+          "type": "integer",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": [],
+      "unique_keys": [
+        {
+          "name": "agencies_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "agency_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "Agency, membership and invitation identity",
+        "scope": "Tenant with shared Auth references",
+        "review": "Preserve independent memberships/accounts; define closure, revocation and retained attribution."
+      },
+      "schema_sha256": "907b0d1c870ef631e1fe836a6e79cfdedfcc44c1ddfe5ce6e530a8346e50002c",
+      "opaque_columns": []
+    },
+    {
+      "name": "public.ai_analyses",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "job_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "input_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "freshness",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "result",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "prompt_version",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "schema_version",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "rubric_version",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "observed_tokens",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "latency_ms",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "ai_analyses_tenant_id_lead_id_job_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id",
+            "job_id"
+          ],
+          "target": "public.ai_jobs",
+          "target_columns": [
+            "tenant_id",
+            "lead_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "ai_analyses_job_id_key",
+          "kind": "u",
+          "columns": [
+            "job_id"
+          ]
+        },
+        {
+          "name": "ai_analyses_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "ai_analyses_tenant_id_lead_id_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "lead_id",
+            "id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "analysis_result_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "AI processing, evidence and replies",
+        "scope": "Tenant or job-parent scope",
+        "review": "Fence active/late processing; inspect private input/output, provider copies and uncertain usage."
+      },
+      "schema_sha256": "ad1099a16f1d520b81f3ec1f681d1a1f752cfc0c4bd668b962ad39b5c6e780b0",
+      "opaque_columns": [
+        "result"
+      ]
+    },
+    {
+      "name": "public.ai_jobs",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "requester_member_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "input_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "prompt_version",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "schema_version",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "policy_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "attempts",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "available_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "lease_token",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "lease_until",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "dispatched_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "uncertain_usage",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "observed_tokens",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "reserved_tokens",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "usage_state",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "requested_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "failure_code",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "month_at",
+          "type": "date",
+          "nullable": false
+        },
+        {
+          "name": "day_at",
+          "type": "date",
+          "nullable": false
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "parameter_hash",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "draft_policy_version",
+          "type": "integer",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "ai_jobs_created_by_fkey",
+          "columns": [
+            "created_by"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "ai_jobs_tenant_id_fkey",
+          "columns": [
+            "tenant_id"
+          ],
+          "target": "public.agencies",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "ai_jobs_tenant_id_lead_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id"
+          ],
+          "target": "public.leads",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "ai_jobs_tenant_id_requester_member_id_fkey",
+          "columns": [
+            "tenant_id",
+            "requester_member_id"
+          ],
+          "target": "public.memberships",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "ai_jobs_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "ai_jobs_tenant_id_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "id"
+          ]
+        },
+        {
+          "name": "ai_jobs_tenant_id_lead_id_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "lead_id",
+            "id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "analysis_job_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "AI processing, evidence and replies",
+        "scope": "Tenant or job-parent scope",
+        "review": "Fence active/late processing; inspect private input/output, provider copies and uncertain usage."
+      },
+      "schema_sha256": "9bd018cea9d998b2371e60912075c4358245c9241f40a578ae9df193d59cc3a5",
+      "opaque_columns": []
+    },
+    {
+      "name": "public.draft_feedback",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "draft_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "content_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "comment",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "draft_feedback_actor_id_fkey",
+          "columns": [
+            "actor_id"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "draft_feedback_tenant_id_lead_id_draft_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id",
+            "draft_id"
+          ],
+          "target": "public.reply_drafts",
+          "target_columns": [
+            "tenant_id",
+            "lead_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "draft_feedback_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "draft_feedback_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "AI processing, evidence and replies",
+        "scope": "Tenant or job-parent scope",
+        "review": "Fence active/late processing; inspect private input/output, provider copies and uncertain usage."
+      },
+      "schema_sha256": "e4f6319b2a574540c4ece4a0745d3b3c6ed037dddbe49a82d6236b3d59365811",
+      "opaque_columns": []
+    },
+    {
+      "name": "public.follow_ups",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "assignee_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "due_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "schedule_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "completion_summary",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "cancel_reason",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "follow_ups_created_by_fkey",
+          "columns": [
+            "created_by"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "follow_ups_tenant_id_assignee_id_fkey",
+          "columns": [
+            "tenant_id",
+            "assignee_id"
+          ],
+          "target": "public.memberships",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "follow_ups_tenant_id_fkey",
+          "columns": [
+            "tenant_id"
+          ],
+          "target": "public.agencies",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "follow_ups_tenant_id_lead_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id"
+          ],
+          "target": "public.leads",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "follow_ups_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "follow_ups_tenant_id_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "follow_up_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "Workspace and customer content",
+        "scope": "Tenant or explicit lead",
+        "review": "Define child handling and field-level retention; include archived/history and delayed writes."
+      },
+      "schema_sha256": "f0284faea9cdcb9f57a1193919d515dd56918185ca8270407ab875fcdd003135",
+      "opaque_columns": []
+    },
+    {
+      "name": "public.invitations",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "role",
+          "type": "member_role",
+          "nullable": false
+        },
+        {
+          "name": "token_hash",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "inviter_member_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "consumed_by",
+          "type": "uuid",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "invitations_consumed_by_fkey",
+          "columns": [
+            "consumed_by"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "invitations_created_by_fkey",
+          "columns": [
+            "created_by"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "invitations_tenant_id_fkey",
+          "columns": [
+            "tenant_id"
+          ],
+          "target": "public.agencies",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "invitations_tenant_id_inviter_member_id_fkey",
+          "columns": [
+            "tenant_id",
+            "inviter_member_id"
+          ],
+          "target": "public.memberships",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "invitations_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "invitations_token_hash_key",
+          "kind": "u",
+          "columns": [
+            "token_hash"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "invitation_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        },
+        {
+          "name": "verified_invitation_read",
+          "command": "SELECT",
+          "permissive": "RESTRICTIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "Agency, membership and invitation identity",
+        "scope": "Tenant with shared Auth references",
+        "review": "Preserve independent memberships/accounts; define closure, revocation and retained attribution."
+      },
+      "schema_sha256": "4879e343a96722c8c55cfa84e51939c8b288ee6c7140911a6d7eca8f8ab635b7",
+      "opaque_columns": []
+    },
+    {
+      "name": "public.leads",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "assignee_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "full_name",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "phone",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "status",
+          "type": "lead_status",
+          "nullable": false
+        },
+        {
+          "name": "source",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "do_not_contact",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "archived_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "context_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "budget_min",
+          "type": "numeric",
+          "nullable": true
+        },
+        {
+          "name": "budget_max",
+          "type": "numeric",
+          "nullable": true
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "duplicate_review",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "confirmed_intent",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "qualification_summary",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "locations",
+          "type": "text[]",
+          "nullable": false
+        },
+        {
+          "name": "qualification_unknowns_ack",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "won_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "outcome_summary",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "deal_value",
+          "type": "numeric",
+          "nullable": true
+        },
+        {
+          "name": "deal_currency",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "lost_reason",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "outcome_reason",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "assignment_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "review_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "budget_period",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "property_type",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "bedrooms",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "purchase_timeline",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "source_reference",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "reported_facts",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "facts_confirmed_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "current_analysis_id",
+          "type": "uuid",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "current_analysis_parent",
+          "columns": [
+            "tenant_id",
+            "id",
+            "current_analysis_id"
+          ],
+          "target": "public.ai_analyses",
+          "target_columns": [
+            "tenant_id",
+            "lead_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "leads_created_by_fkey",
+          "columns": [
+            "created_by"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "leads_tenant_id_assignee_id_fkey",
+          "columns": [
+            "tenant_id",
+            "assignee_id"
+          ],
+          "target": "public.memberships",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "leads_tenant_id_fkey",
+          "columns": [
+            "tenant_id"
+          ],
+          "target": "public.agencies",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "leads_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "leads_tenant_id_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "id"
+          ]
+        }
+      ],
+      "triggers": [
+        {
+          "name": "analysis_context_changed",
+          "function_schema": "private",
+          "function_name": "analysis_context_changed",
+          "enabled": "O"
+        },
+        {
+          "name": "invalidate_draft_review",
+          "function_schema": "private",
+          "function_name": "invalidate_draft_review",
+          "enabled": "O"
+        },
+        {
+          "name": "lead_notice_event",
+          "function_schema": "private",
+          "function_name": "capture_notification_event",
+          "enabled": "O"
+        },
+        {
+          "name": "lead_notice_versions",
+          "function_schema": "private",
+          "function_name": "bump_notice_versions",
+          "enabled": "O"
+        }
+      ],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "lead_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "Workspace and customer content",
+        "scope": "Tenant or explicit lead",
+        "review": "Define child handling and field-level retention; include archived/history and delayed writes."
+      },
+      "schema_sha256": "7ea2553e9416ea6a96ae11d8b33a532bf94d8e5daa2fcef405a1d0210186543a",
+      "opaque_columns": [
+        "reported_facts"
+      ]
+    },
+    {
+      "name": "public.memberships",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "role",
+          "type": "member_role",
+          "nullable": false
+        },
+        {
+          "name": "active",
+          "type": "boolean",
+          "nullable": false
+        },
+        {
+          "name": "display_name",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "deactivated_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "memberships_tenant_id_fkey",
+          "columns": [
+            "tenant_id"
+          ],
+          "target": "public.agencies",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "memberships_user_id_fkey",
+          "columns": [
+            "user_id"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "memberships_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "memberships_tenant_id_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "id"
+          ]
+        },
+        {
+          "name": "memberships_tenant_id_user_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "user_id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "own_membership_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        },
+        {
+          "name": "verified_membership_read",
+          "command": "SELECT",
+          "permissive": "RESTRICTIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "Agency, membership and invitation identity",
+        "scope": "Tenant with shared Auth references",
+        "review": "Preserve independent memberships/accounts; define closure, revocation and retained attribution."
+      },
+      "schema_sha256": "6c8c6056966967a964d91c53bea99cdca7e38fd013c31a845ff352f2aaa2aeab",
+      "opaque_columns": []
+    },
+    {
+      "name": "public.message_revisions",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "message_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "previous_body",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "revision",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "message_revisions_actor_id_fkey",
+          "columns": [
+            "actor_id"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "message_revisions_tenant_id_lead_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id"
+          ],
+          "target": "public.leads",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "message_revisions_tenant_id_lead_id_message_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id",
+            "message_id"
+          ],
+          "target": "public.messages",
+          "target_columns": [
+            "tenant_id",
+            "lead_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "message_revisions_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "message_revisions_tenant_id_message_id_revision_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "message_id",
+            "revision"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "revision_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "Workspace and customer content",
+        "scope": "Tenant or explicit lead",
+        "review": "Define child handling and field-level retention; include archived/history and delayed writes."
+      },
+      "schema_sha256": "339191efb104e73381fcb2610096ad3099529bbffa4e91b0902c799333a1b8fa",
+      "opaque_columns": []
+    },
+    {
+      "name": "public.messages",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "direction",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "channel",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "author_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "delivery_status",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "source_reference",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "ingested_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "messages_author_id_fkey",
+          "columns": [
+            "author_id"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "messages_tenant_id_lead_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id"
+          ],
+          "target": "public.leads",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "message_parent_unique",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "lead_id",
+            "id"
+          ]
+        },
+        {
+          "name": "messages_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "messages_tenant_id_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "message_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "Workspace and customer content",
+        "scope": "Tenant or explicit lead",
+        "review": "Define child handling and field-level retention; include archived/history and delayed writes."
+      },
+      "schema_sha256": "b1ce59b2460d893f55d796b18429ad39df52b1fae857938ee417ad6f678c28b8",
+      "opaque_columns": []
+    },
+    {
+      "name": "public.notifications",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "recipient_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "type",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "resource_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "task_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "schedule_version",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "assignment_version",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "review_version",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "dedupe_key",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "read_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "dismissed_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "input_version",
+          "type": "integer",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "notifications_tenant_id_fkey",
+          "columns": [
+            "tenant_id"
+          ],
+          "target": "public.agencies",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "notifications_tenant_id_lead_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id"
+          ],
+          "target": "public.leads",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "notifications_tenant_id_recipient_id_fkey",
+          "columns": [
+            "tenant_id",
+            "recipient_id"
+          ],
+          "target": "public.memberships",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "notifications_tenant_id_task_id_fkey",
+          "columns": [
+            "tenant_id",
+            "task_id"
+          ],
+          "target": "public.follow_ups",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "notifications_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "notifications_tenant_id_recipient_id_dedupe_key_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "recipient_id",
+            "dedupe_key"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "notification_recipient",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        },
+        {
+          "name": "verified_notification_read",
+          "command": "SELECT",
+          "permissive": "RESTRICTIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "Workspace and customer content",
+        "scope": "Tenant or explicit lead",
+        "review": "Define child handling and field-level retention; include archived/history and delayed writes."
+      },
+      "schema_sha256": "7f5b91fb9d87528b63520bd4e970ab5a471a40869f8ce2978e07bce3ab60ed66",
+      "opaque_columns": []
+    },
+    {
+      "name": "public.privacy_case_actions",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "case_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "actor_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "action",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "case_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "privacy_case_actions_actor_id_fkey",
+          "columns": [
+            "actor_id"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "privacy_case_actions_tenant_id_case_id_fkey",
+          "columns": [
+            "tenant_id",
+            "case_id"
+          ],
+          "target": "public.privacy_cases",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "privacy_case_actions_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "privacy_case_actions_tenant_id_case_id_case_version_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "case_id",
+            "case_version"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "privacy_action_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "Audit and privacy review evidence",
+        "scope": "Tenant; some events have no lead reference",
+        "review": "Review reasons/details/verification references and minimized justified evidence; no blanket audit exemption."
+      },
+      "schema_sha256": "1687d74f15f113fcbf08baca9c37142da4362c80a966c2c69df3d7337cd0cdba",
+      "opaque_columns": []
+    },
+    {
+      "name": "public.privacy_cases",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "kind",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "requested_by",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "reviewer_member_id",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "verification_reference",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "hold_reason",
+          "type": "text",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "privacy_cases_requested_by_fkey",
+          "columns": [
+            "requested_by"
+          ],
+          "target": "auth.users",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "privacy_cases_tenant_id_fkey",
+          "columns": [
+            "tenant_id"
+          ],
+          "target": "public.agencies",
+          "target_columns": [
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "privacy_cases_tenant_id_lead_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id"
+          ],
+          "target": "public.leads",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "privacy_cases_tenant_id_reviewer_member_id_fkey",
+          "columns": [
+            "tenant_id",
+            "reviewer_member_id"
+          ],
+          "target": "public.memberships",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "privacy_cases_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "privacy_cases_tenant_id_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "privacy_case_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        },
+        {
+          "name": "verified_privacy_read",
+          "command": "SELECT",
+          "permissive": "RESTRICTIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "Audit and privacy review evidence",
+        "scope": "Tenant; some events have no lead reference",
+        "review": "Review reasons/details/verification references and minimized justified evidence; no blanket audit exemption."
+      },
+      "schema_sha256": "c28cbe24e97a5e3c0cb6ef38ac4f05f9cc4c66244f51a7b8aba6cbec8123fcd9",
+      "opaque_columns": []
+    },
+    {
+      "name": "public.reply_drafts",
+      "kind": "r",
+      "rls": true,
+      "forced_rls": false,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "tenant_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "lead_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "job_id",
+          "type": "uuid",
+          "nullable": false
+        },
+        {
+          "name": "input_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "freshness",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "content_version",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "original_text",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "working_text",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "language",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "tone",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "safety_flags",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "outline",
+          "type": "jsonb",
+          "nullable": false
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "prompt_version",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "schema_version",
+          "type": "text",
+          "nullable": false
+        },
+        {
+          "name": "observed_tokens",
+          "type": "bigint",
+          "nullable": false
+        },
+        {
+          "name": "latency_ms",
+          "type": "integer",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": false
+        },
+        {
+          "name": "approved_by",
+          "type": "uuid",
+          "nullable": true
+        },
+        {
+          "name": "approved_member_version",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "approved_assignment_version",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "approved_content_version",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "approved_input_version",
+          "type": "integer",
+          "nullable": true
+        },
+        {
+          "name": "approved_at",
+          "type": "timestamp with time zone",
+          "nullable": true
+        },
+        {
+          "name": "rejection_reason",
+          "type": "text",
+          "nullable": true
+        }
+      ],
+      "foreign_keys": [
+        {
+          "name": "reply_drafts_tenant_id_approved_by_fkey",
+          "columns": [
+            "tenant_id",
+            "approved_by"
+          ],
+          "target": "public.memberships",
+          "target_columns": [
+            "tenant_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        },
+        {
+          "name": "reply_drafts_tenant_id_lead_id_job_id_fkey",
+          "columns": [
+            "tenant_id",
+            "lead_id",
+            "job_id"
+          ],
+          "target": "public.ai_jobs",
+          "target_columns": [
+            "tenant_id",
+            "lead_id",
+            "id"
+          ],
+          "delete_action": "a",
+          "deferrable": false,
+          "initially_deferred": false
+        }
+      ],
+      "unique_keys": [
+        {
+          "name": "reply_drafts_job_id_key",
+          "kind": "u",
+          "columns": [
+            "job_id"
+          ]
+        },
+        {
+          "name": "reply_drafts_pkey",
+          "kind": "p",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "reply_drafts_tenant_id_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "id"
+          ]
+        },
+        {
+          "name": "reply_drafts_tenant_id_lead_id_id_key",
+          "kind": "u",
+          "columns": [
+            "tenant_id",
+            "lead_id",
+            "id"
+          ]
+        }
+      ],
+      "triggers": [],
+      "dependencies": [],
+      "policies": [
+        {
+          "name": "draft_read",
+          "command": "SELECT",
+          "permissive": "PERMISSIVE",
+          "roles": [
+            "authenticated"
+          ]
+        }
+      ],
+      "review": {
+        "category": "AI processing, evidence and replies",
+        "scope": "Tenant or job-parent scope",
+        "review": "Fence active/late processing; inspect private input/output, provider copies and uncertain usage."
+      },
+      "schema_sha256": "28550bb8667a092e875713e26589cdfb70c33c8ac1fde666cb0185f7b475bae4",
+      "opaque_columns": [
+        "safety_flags",
+        "outline"
+      ]
+    }
+  ]
+}

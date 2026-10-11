@@ -11,8 +11,8 @@ The interface is English. Customer inquiries can contain multilingual text; enab
 | Area | Status |
 | --- | --- |
 | P0–P7: foundation, CRM workflows, team, capture, AI modules and dashboard | Implemented and verified locally |
-| P8: hardening and release preparation | In progress; twenty-nine local slices verified, including Operations/AI usage recovery, Settings recovery and invitation receipts, Website integrations recovery, CSV import recovery, Leads inbox/Add lead recovery, Dashboard recovery, Follow-up queue recovery, Notifications inbox/badge recovery, AI/reply-draft recovery, Facts/duplicate-review recovery and authenticator setup UX |
-| Latest complete local regression | 796/796 tests pass |
+| P8: hardening and release preparation | In progress; thirty local slices verified, including offline privacy schema inventory/drift checks, Operations/AI usage recovery, Settings recovery and invitation receipts, Website integrations recovery, CSV import recovery, Leads inbox/Add lead recovery, Dashboard recovery, Follow-up queue recovery, Notifications inbox/badge recovery, AI/reply-draft recovery, Facts/duplicate-review recovery and authenticator setup UX |
+| Latest complete local regression | 806/806 tests pass |
 | Backend and frontend type checks | Pass |
 | Constructed analysis / draft contract evaluations | 100 analysis cases and 56 draft cases pass |
 | Production build | Pass |
@@ -213,7 +213,9 @@ See [Local scheduler](docs/LOCAL_SCHEDULER.md) for locks, safe status reporting,
 | `frontend` | `pnpm start` | Serve the built application on port 4000 |
 | `frontend` | `pnpm typecheck` | Check both frontend and backend types |
 | `backend` | `pnpm test` | Run backend regression tests |
-| `backend` | `pnpm verify:local` | Run bounded full regression, both type checks, contract evaluations and production build; write fresh evidence |
+| `backend` | `pnpm verify:local` | Run bounded full regression, both type checks, contract evaluations, saved privacy inventory verification and production build; write fresh evidence |
+| `backend` | `pnpm inventory:privacy` | Generate local public/private schema metadata and review dependencies; no remote connection or record values |
+| `backend` | `pnpm check:privacy-inventory` | Verify reviewed local metadata and saved JSON/Markdown artifacts; no report update or execution |
 | `backend` | `pnpm check:supabase` | Offline public configuration validation |
 | `backend` | `pnpm check:workers` | Offline worker configuration validation |
 | `backend` | `pnpm check:intake` | Offline worker/intake configuration validation |
@@ -260,6 +262,7 @@ Staging checks, platform monitoring, private AI diagnostics and key-rotation too
 | Notifications client recovery | [Inbox and unread badge recovery](docs/NOTIFICATION_RECOVERY.md) |
 | Worker operation and monitoring | [Operations](docs/OPERATIONS.md), [local scheduler](docs/LOCAL_SCHEDULER.md), [platform monitoring](docs/PLATFORM_MONITORING.md) |
 | Privacy and retained-input verification | [Privacy impact](docs/PRIVACY_IMPACT.md), [privacy recovery](docs/PRIVACY_RECOVERY.md) |
+| Privacy inventory preparation | [Offline tool and limitations](docs/PRIVACY_INVENTORY_TOOL.md), [schema inventory](docs/PRIVACY_DATA_INVENTORY.md), [remaining policy decisions](docs/PRIVACY_POLICY_REQUIREMENTS.md) |
 | Release preparation and incident procedures | [Release checklist](docs/RELEASE_CHECKLIST.md), [release evidence](docs/RELEASE_EVIDENCE.md), [runbooks](docs/RUNBOOKS.md) |
 
 Historical documents contain dated milestone snapshots. Use the product execution tracker and latest generated verification manifest for current implementation/evidence status.

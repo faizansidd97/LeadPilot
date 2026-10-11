@@ -2,6 +2,8 @@
 
 This worksheet makes the remaining A22 implementation dependency concrete. It records requirements to decide; it is not an approved legal policy or a deletion authorization. Current Privacy supports request intake, identity-reference review, holds/history and a partial impact preview. It cannot erase leads, close agencies or replay deletions after restore.
 
+12 October 2026 user clarification: the policy has not been decided. No retention durations, permanent-deletion/anonymization choice or backup treatment is approved. Continue independent local preparation; execution remains unavailable until concrete policy requirements are supplied and implemented/tested.
+
 The project owner and appropriate privacy reviewer must provide a dated decision reference for these values before irreversible execution is designed. No fixed number of retention days, assumed residency or blanket retention exemption has been selected.
 
 | Required decision | Value / evidence still needed |
@@ -20,6 +22,8 @@ The project owner and appropriate privacy reviewer must provide a dated decision
 | Support and recovery | Named support access rules, verified account recovery, escalation, complaints and incident procedure |
 
 ## Implementation sequence after decisions
+
+Local preparation now includes PRIVACY_DATA_INVENTORY.md and its JSON companion. The offline tool classifies the 39 current public/private tables and one derived view, records declared dependencies and detects unreviewed metadata drift. This is reviewed local catalog coverage only. Hosted Auth/storage, function bodies, row/opaque-content attribution, external/provider/log/backup copies and the independent restore manifest are not inventoried or approved. The CLI never enables deletion or modifies its reviewed baseline automatically.
 
 1. Inventory public and private relationships, constraints, triggers, background context/queue/replay/limit data, integration/import artifacts, shared Auth identities and approved external/backup copies. Extend the current partial impact preview; do not turn its counts directly into deletion instructions.
 2. Add a versioned policy and version-bound execution plan with explicit denied/unapproved/held/uncertain states. A reviewed request or identity reference alone never grants execution. Recheck current scope, role, MFA, holds, case/policy versions and dependencies before committing.

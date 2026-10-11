@@ -27,6 +27,8 @@
     "benchmark:local": "node --experimental-strip-types scripts/benchmark-local.mjs",
     "verify:local": "node scripts/verify-local.mjs",
     "check:release": "node scripts/check-release.mjs",
+    "inventory:privacy": "node --experimental-strip-types scripts/privacy-inventory.mjs",
+    "check:privacy-inventory": "node --experimental-strip-types scripts/privacy-inventory.mjs --check",
     "check:health": "node --experimental-strip-types scripts/check-platform-health.mjs",
     "inspect:ai-attempts": "node --experimental-strip-types scripts/inspect-ai-attempts.mjs",
     "rotate:intake-encryption": "node --experimental-strip-types scripts/rotate-intake-encryption.mjs",

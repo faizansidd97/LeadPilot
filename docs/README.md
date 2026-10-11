@@ -12,6 +12,8 @@ The start-to-end roadmap and execution tracker are in [PRODUCT_PLAN.md](PRODUCT_
 
 The current handoff is in [DELIVERY_STATUS.md](DELIVERY_STATUS.md). Remaining privacy decisions are in [PRIVACY_POLICY_REQUIREMENTS.md](PRIVACY_POLICY_REQUIREMENTS.md), and the prepared baseline/training/weekly pilot protocol is in [PILOT_PROTOCOL.md](PILOT_PROTOCOL.md). These documents do not claim release or pilot completion.
 
+The [local privacy schema inventory](PRIVACY_DATA_INVENTORY.md) and [offline inventory tool](PRIVACY_INVENTORY_TOOL.md) cover reviewed public/private metadata and identify opaque/shared/indirect dependencies. Full data inventory, policy and execution remain pending; no customer values or remote configuration are read by this developer tool.
+
 ## Folder structure
 
 

@@ -8,7 +8,7 @@ P0–P7 implementation is preserved: authenticated agencies/team/MFA, leads and 
 
 The final client recovery pass includes Settings profile/team/invitation/agency/pilot/owner transfer and Operations/owner AI usage. Original uncertain Settings saves keep their original payload/key; acknowledged writes recover with reads only. Private links require current matching invitation state. Queue and usage refreshes hide unverified counts and fence duplicate/late reads. See SETTINGS_RECOVERY.md and OPERATIONS_RECOVERY.md.
 
-Final full local verification passes 796/796 regressions, both package type checks, 100 analysis/56 draft constructed contracts and production build. LOCAL_CHECKS.json is the authoritative generated source/check record. RELEASE_EVIDENCE.md records counts, runtime, fingerprint and limitations; DEPENDENCY_AUDIT.json records the separate point-in-time advisory result for the lock file. These are synthetic/local compiler/database checks, not live-provider quality or hosted/browser sign-off. Schema remains 001–023 and development stays on localhost:4000. No new migration or key is needed for the final recovery changes.
+Final full local verification passes 806/806 regressions, both package type checks, 100 analysis/56 draft constructed contracts and saved privacy inventory verification and production build. LOCAL_CHECKS.json is the authoritative generated source/check record. RELEASE_EVIDENCE.md records counts, runtime, fingerprint and limitations; DEPENDENCY_AUDIT.json records the separate point-in-time advisory result for the lock file. These are synthetic/local compiler/database checks, not live-provider quality or hosted/browser sign-off. Schema remains 001–023 and development stays on localhost:4000. No new migration or key is needed for the final recovery changes.
 
 ## Remaining dependencies in order
 
@@ -27,5 +27,7 @@ P8 remains IN PROGRESS / release NOT_READY. P9 is PREPARED, NOT STARTED. P10–P
 ## Audit result and next local dependency
 
 The reviewed source has no advertised execution route behind the Privacy “unavailable” notice. That is an explicit missing policy-dependent feature, not a passing test claim. Current impact counts omit private/provider/backup dependencies, as documented. The next implementation dependency is the approved privacy policy and full inventory/restore protocol. Remaining hosted acceptance is intentionally deferred until separate staging and permitted test access exist.
+
+12 October continuation: the user confirms that privacy policy is not yet decided. The offline developer tool now covers reviewed catalog metadata for 39 public/private tables and one view, with drift checks, declared relationships and opaque/shared/global scope concerns (PRIVACY_DATA_INVENTORY.md and PRIVACY_INVENTORY_TOOL.md). This advances independent preparation; it does not complete actual private row attribution, hosted Auth, function/expression behavior or external/provider/log/backup inventory, and it does not enable deletion/closure.
 
 No arbitrary price, retention period, provider, region, automated sending or release percentage was selected. The current phase report and future roadmap remain in PRODUCT_PLAN.md. This preparation is complete as a document; it does not complete the real release or pilot.
