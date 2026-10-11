@@ -90,3 +90,7 @@ Notifications publish a validated list/summary pair, distinguish unavailable his
 ## Standalone follow-up queue
 
 The queue now uses scoped current request/action tickets, validated tenant/filter/ordered projected pages, synchronous refresh/paging/filter/open gates and explicit unavailable versus confirmed empty states. Read-only recovery starts from the first page; opening validates the latest scoped lead before a current workspace callback. API cursors retain PostgreSQL due timestamp precision. Fifteen meaningful helper/deferred/isolated-SQL checks cover these boundaries; mounted browser and hosted acceptance remain pending. See [FOLLOW_UP_RECOVERY.md](FOLLOW_UP_RECOVERY.md).
+
+## Dashboard metrics and drilldown
+
+Dashboard uses scope-keyed mounting, current cancellable tickets and a synchronous date/refresh/metric/paging/open gate. Validated summaries and projected metric pages distinguish unavailable from confirmed zero/empty results; failed reads retain requested dates and mask unverified previews. Precise descending cursors bind the current agency/actor/date/metric/cutoff, while close-list and scope changes fence late reads or navigation. Opening loads the latest scoped projected lead before a current workspace callback. Counts and subsequent pages remain current reads, not a frozen snapshot. See [DASHBOARD_RECOVERY.md](DASHBOARD_RECOVERY.md) for 17 meaningful local checks, authority/memory limits and pending mounted browser/hosted evidence.
