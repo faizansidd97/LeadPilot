@@ -1,8 +1,8 @@
 import {parseArgs} from 'node:util';
-import {readFile,writeFile,open,mkdir,unlink,rename} from 'node:fs/promises';
+import {readFile,writeFile,open,mkdir,unlink} from 'node:fs/promises';
 import {randomUUID} from 'node:crypto';
 import {parseEnv} from './local-evidence.mjs';
-import {localRunnerConfiguration,localNotificationLoop,runLocalNotificationTick,LOCAL_INTERVAL_MS} from '../src/server/local-notification-runner.ts';
+import {localRunnerConfiguration,localNotificationLoop,runLocalNotificationTick,LOCAL_INTERVAL_MS,replaceLocalRunnerStatus} from '../src/server/local-notification-runner.ts';
 
 const cache=new URL('../.cache/',import.meta.url),lock=new URL('local-notifications.lock',cache),
  stopFile=new URL('local-notifications.stop',cache),statusFile=new URL('local-notifications.json',cache);
@@ -38,7 +38,7 @@ try{
    mode:'DIRECT_DEVELOPMENT_WORKER_RPC',runs:0,successful_runs:0,failed_runs:0,notifications_written:0,history:[],
    protected_http_verified:false,deployed_scheduler_verified:false,recipient_ui_verified:false,release_accepted:false};
   const save=async()=>{report.updated_at=stamp();const temp=new URL('local-notifications.'+token+'.tmp',cache);
-   await writeFile(temp,JSON.stringify(report,null,2)+'\n',{mode:0o600});await rename(temp,statusFile);};
+   await writeFile(temp,JSON.stringify(report,null,2)+'\n',{mode:0o600});await replaceLocalRunnerStatus(temp,statusFile);};
   await save();console.log('Local notification runner started. Cadence: 60 seconds. No email or AI dispatch.');
   try{
    await localNotificationLoop({signal:controller.signal,tick:signal=>runLocalNotificationTick(env,signal),record:async result=>{

@@ -2,6 +2,14 @@ import { z } from 'zod';
 import { statuses } from './leads.ts';
 export const taskTypes=['CALL','MESSAGE','EMAIL','VIEWING','INTERNAL'] as const;
 export type TaskType=typeof taskTypes[number];
+export const taskStates=['OPEN','COMPLETED','CANCELLED'] as const;
+export type TaskState=typeof taskStates[number];
+export const followUpListSchema=z.object({limit:z.coerce.number().int().min(1).max(100).default(25),lead_id:z.uuid().optional(),state:z.enum(taskStates).optional(),cursor:z.string().max(512).optional()}).strict();
+export const followUpCursorSchema=z.object({due_at:z.iso.datetime({offset:true}),id:z.uuid()}).strict();
+export function followUpCursorValue(row:{due_at:string;id:string}){return followUpCursorSchema.parse({due_at:row.due_at,id:row.id});}
+export const followUpInboxRowSchema=z.object({id:z.uuid(),tenant_id:z.uuid(),lead_id:z.uuid(),assignee_id:z.uuid().nullable(),type:z.enum(taskTypes),title:z.string().min(1).max(150).refine(v=>!!v.trim()),due_at:z.iso.datetime({offset:true}),state:z.enum(taskStates),version:z.number().int().positive(),schedule_version:z.number().int().positive(),leads:z.object({id:z.uuid(),full_name:z.string().min(1).max(120).refine(v=>!!v.trim())})}).refine(row=>row.lead_id===row.leads.id,'Invalid task lead.');
+export const followUpInboxPageSchema=z.object({follow_ups:z.array(followUpInboxRowSchema).max(100),pagination:z.object({next_cursor:z.string().min(1).max(512).nullable()})});
+export type FollowUpInboxRow=z.infer<typeof followUpInboxRowSchema>;
 export type FollowUp={id:string;lead_id:string;assignee_id:string|null;type:TaskType;title:string;notes:string;due_at:string;state:'OPEN'|'COMPLETED'|'CANCELLED';version:number;schedule_version:number;completion_summary?:string|null;cancel_reason?:string|null;leads?:{id:string;full_name:string}};
 export type ConversationMessage={id:string;direction:'INBOUND'|'OUTBOUND'|'INTERNAL';body:string;occurred_at:string;created_at:string;delivery_status?:'USER_REPORTED'|null;channel?:'MANUAL'|'WEBSITE';version?:number;source_reference?:string|null;ingested_at?:string|null;revisions?:{previous_body:string;reason:string;actor_id:string;created_at:string;revision:number}[]};
 const version=z.number().int().positive();

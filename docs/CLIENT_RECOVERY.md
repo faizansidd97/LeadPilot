@@ -86,3 +86,7 @@ Scope-keyed AI panels share the dialog's synchronous action boundary, validate/p
 ## Recipient notifications and unread badge
 
 Notifications publish a validated list/summary pair, distinguish unavailable history from empty/caught-up results, mask stale sensitive previews and fence filter/paging/scope/navigation. Original read/dismiss saves recover explicitly with the same body/version/key; acknowledged saves recover with reads only. Open reauthorizes and loads the latest lead before current navigation, including another check after an unread notice is saved. Workspace badge polling yields to the inbox and rejects late/malformed counts. See [NOTIFICATION_RECOVERY.md](NOTIFICATION_RECOVERY.md) for recipient authority, timestamp precision, memory limits and pending browser/hosted evidence.
+
+## Standalone follow-up queue
+
+The queue now uses scoped current request/action tickets, validated tenant/filter/ordered projected pages, synchronous refresh/paging/filter/open gates and explicit unavailable versus confirmed empty states. Read-only recovery starts from the first page; opening validates the latest scoped lead before a current workspace callback. API cursors retain PostgreSQL due timestamp precision. Fifteen meaningful helper/deferred/isolated-SQL checks cover these boundaries; mounted browser and hosted acceptance remain pending. See [FOLLOW_UP_RECOVERY.md](FOLLOW_UP_RECOVERY.md).

@@ -1,9 +1,20 @@
 import {createClient} from '@supabase/supabase-js';
 import {z} from 'zod';
+import {rename} from 'node:fs/promises';
 import {runNotifications,type WorkerDb} from './notification-worker.ts';
 
 type Environment=Record<string,string|undefined>;
 export const LOCAL_INTERVAL_MS=60_000;
+export async function replaceLocalRunnerStatus(temp:URL,target:URL,options:{replace?:typeof rename;pause?:(ms:number)=>Promise<void>}={}){
+ const replace=options.replace??rename,pause=options.pause??(ms=>new Promise(resolve=>setTimeout(resolve,ms)));
+ // A Windows reader can briefly block replacement. Retry only the same file rename, never the worker tick.
+ for(let attempt=0;;attempt++){
+  try{await replace(temp,target);return;}catch(error){
+   if(attempt>=4||!['EPERM','EACCES','EBUSY'].includes((error as NodeJS.ErrnoException).code??''))throw error;
+   await pause(50*2**attempt);
+  }
+ }
+}
 const allowed=new Set(['worker_seed_due','worker_claim_notifications','worker_finish_notification',
  'worker_fail_notification','worker_notification_metrics','worker_prepare_invitation_mail','worker_complete_invitation_mail']);
 const count=z.number().int().min(0).max(Number.MAX_SAFE_INTEGER);

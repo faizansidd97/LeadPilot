@@ -6,7 +6,7 @@ import {tmpdir} from 'node:os';
 import {join,resolve,dirname,basename} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {fileURLToPath} from 'node:url';
-import {localRunnerConfiguration,runLocalNotificationTick,localNotificationLoop,summarizeNotificationRun,waitForNextRun,
+import {localRunnerConfiguration,runLocalNotificationTick,localNotificationLoop,summarizeNotificationRun,waitForNextRun,replaceLocalRunnerStatus,
  type TickResult} from '../src/server/local-notification-runner.ts';
 const key='sb_secret_'+'a'.repeat(40),env={APP_URL:'http://localhost:4000',NEXT_PUBLIC_SUPABASE_URL:'https://development.example.test',SUPABASE_SERVICE_ROLE_KEY:key};
 const metrics={due_lag_seconds:0,outbox_lag_seconds:0,pending_jobs:0,failed_jobs:0,cleaned_limit_windows:0,alert:false};
@@ -120,6 +120,20 @@ test('status persistence failure stops the loop instead of silently scheduling u
   record:async()=>{throw Error('DISK_FULL');},wait:async()=>{throw Error('SHOULD_NOT_WAIT');}}),/DISK_FULL/);
  assert.equal(calls,1);
 });
+test('Transient status replacement retries the same file without repeating a recorded worker tick',async()=>{
+ const signal=new AbortController(),temp=new URL('file:///synthetic/status.tmp'),target=new URL('file:///synthetic/status.json');let calls=0,records=0,replaces=0;const pauses:number[]=[];
+ await localNotificationLoop({signal:signal.signal,tick:async()=>{calls++;return idle;},record:async()=>{records++;await replaceLocalRunnerStatus(temp,target,{replace:async(from,to)=>{assert.equal(from,temp);assert.equal(to,target);if(++replaces<3)throw Object.assign(Error('Transient sharing failure'),{code:replaces===1?'EPERM':'EBUSY'});},pause:async ms=>{pauses.push(ms);}});},wait:async()=>{signal.abort();}});
+ assert.equal(calls,1);assert.equal(records,1);assert.equal(replaces,3);assert.deepEqual(pauses,[50,100]);
+});
+test('Persistent status sharing failure stays bounded and fails closed before another worker run',async()=>{
+ const temp=new URL('file:///synthetic/status.tmp'),target=new URL('file:///synthetic/status.json'),failure=Object.assign(Error('Sharing failure'),{code:'EACCES'});let calls=0,replaces=0,waits=0;const pauses:number[]=[];
+ await assert.rejects(localNotificationLoop({signal:new AbortController().signal,tick:async()=>{calls++;return idle;},record:async()=>replaceLocalRunnerStatus(temp,target,{replace:async()=>{replaces++;throw failure;},pause:async ms=>{pauses.push(ms);}}),wait:async()=>{waits++;}}),error=>error===failure);
+ assert.equal(calls,1);assert.equal(replaces,5);assert.equal(waits,0);assert.deepEqual(pauses,[50,100,200,400]);
+});
+test('Nontransient status disk failure is not retried or reported as a successful publication',async()=>{
+ const failure=Object.assign(Error('Disk failure'),{code:'ENOSPC'});let replaces=0;
+ await assert.rejects(replaceLocalRunnerStatus(new URL('file:///synthetic/status.tmp'),new URL('file:///synthetic/status.json'),{replace:async()=>{replaces++;throw failure;},pause:async()=>assert.fail('No retry expected')}),error=>error===failure);assert.equal(replaces,1);
+});
 
 test('CLI requires explicit activation and help/invalid arguments do not read development configuration',()=>{
  const script=fileURLToPath(new URL('../scripts/run-local-notifications.mjs',import.meta.url));
@@ -138,19 +152,20 @@ test('actual CLI enforces one owner, publishes safe status and stops cooperative
   await writeFile(join(temporary,'frontend','.env.local'),'APP_URL=http://localhost:4000\n');
   const runnerURL=new URL('../src/server/local-notification-runner.ts',import.meta.url).href;
   // Inject only the tick/config dependencies: exercise the shipped CLI lock/files/process controls.
-  const stub=join(scripts,'tick.mjs');await writeFile(stub,`export {localNotificationLoop,LOCAL_INTERVAL_MS} from ${JSON.stringify(runnerURL)};
+  const stub=join(scripts,'tick.mjs');await writeFile(stub,`export {localNotificationLoop,LOCAL_INTERVAL_MS,replaceLocalRunnerStatus} from ${JSON.stringify(runnerURL)};
 export const localRunnerConfiguration=()=>({});
 export const runLocalNotificationTick=async()=>(${JSON.stringify(idle)});`);
   const original=await readFile(new URL('../scripts/run-local-notifications.mjs',import.meta.url),'utf8');
   const script=join(scripts,'runner.mjs');await writeFile(script,original
    .replace("'./local-evidence.mjs'",JSON.stringify(new URL('../scripts/local-evidence.mjs',import.meta.url).href))
    .replace("'../src/server/local-notification-runner.ts'",JSON.stringify(pathToFileURL(stub).href)));
-  child=spawn(process.execPath,['--experimental-strip-types',script,'--start'],{windowsHide:true,stdio:'ignore'});
+  child=spawn(process.execPath,['--experimental-strip-types',script,'--start'],{windowsHide:true,stdio:['ignore','pipe','pipe']});
+  let diagnostic='';child.stdout?.on('data',value=>{diagnostic+=value;});child.stderr?.on('data',value=>{diagnostic+=value;});
   const closed=new Promise<number|null>(resolveClose=>child!.once('close',resolveClose));
   const until=async(check:()=>Promise<boolean>)=>{
    const deadline=Date.now()+15000;while(Date.now()<deadline){if(await check())return;await new Promise(r=>setTimeout(r,50));}throw Error('CLI_TEST_TIMEOUT');
   };
-  await until(async()=>{try{return JSON.parse(await readFile(join(cache,'local-notifications.json'),'utf8')).runs===1;}catch{return false;}});
+  await until(async()=>{if(child?.exitCode!==null)throw Error('CLI_TEST_EARLY_EXIT: '+diagnostic);try{return JSON.parse(await readFile(join(cache,'local-notifications.json'),'utf8')).runs===1;}catch{return false;}});
   const owner=JSON.parse(await readFile(join(cache,'local-notifications.lock'),'utf8'));
   assert.equal(owner.pid,child.pid);assert.equal(child.exitCode,null);process.kill(owner.pid,0);
   const duplicate=spawnSync(process.execPath,['--experimental-strip-types',script,'--start'],{encoding:'utf8',windowsHide:true,timeout:10000});

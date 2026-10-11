@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-10-11T08:44:57.151Z",
+  "generated_at": "2026-10-11T09:03:19.453Z",
   "node": "v24.19.0",
   "source": {
-    "sha256": "e2177b6f58fcb002d527202234b85463cb26442daa476f87cb806ce2400fc49a",
-    "files": 282
+    "sha256": "13a5c918b4a028ce93cf3eaa34680868d60d23c868f90a8e6774f60ea09e455a",
+    "files": 284
   },
   "status": "PASS",
   "checks": [
@@ -11,39 +11,39 @@
       "name": "regression",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 151449,
-      "tests": 671,
-      "passed": 671
+      "duration_ms": 108175,
+      "tests": 689,
+      "passed": 689
     },
     {
       "name": "backend-types",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 5080
+      "duration_ms": 11759
     },
     {
       "name": "frontend-types",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 2765
+      "duration_ms": 7047
     },
     {
       "name": "analysis-contracts",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 336
+      "duration_ms": 710
     },
     {
       "name": "draft-contracts",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 291
+      "duration_ms": 720
     },
     {
       "name": "production-build",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 21864
+      "duration_ms": 36200
     }
   ],
   "scope": "Local synthetic/emulated Auth/database and compiler evidence only",
