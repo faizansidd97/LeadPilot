@@ -1,0 +1,13 @@
+import {z} from 'zod';
+const version=z.number().int().positive().max(2147483647),count=z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),stamp=z.iso.datetime({offset:true}),role=z.enum(['OWNER','ADMIN','AGENT']);
+const name=z.string().min(2).max(120).nullable(),email=z.email().max(254);
+export const settingsSnapshotSchema=z.object({membership:z.object({id:z.uuid(),role,version,display_name:name,email}),agency:z.object({id:z.uuid(),name:z.string().min(2).max(120),timezone:z.string().max(120).refine(v=>{try{new Intl.DateTimeFormat('en',{timeZone:v});return true;}catch{return false;}}),locale:z.literal('en'),version,ai_enabled:z.boolean(),processing_approved:z.boolean(),processing_reference:z.string().max(500).nullable()}),pilot:z.object({seat_limit:z.number().int().min(1).max(10000).nullable(),ai_daily_limit:z.number().int().min(0).max(1000000).nullable(),ai_monthly_limit:z.number().int().min(0).max(1000000).nullable(),active_seats:count,pending_seats:count}).nullable(),onboarding:z.object({'Agency details':z.boolean(),'Processing settings':z.boolean(),'Invite team':z.boolean(),'Sample lead':z.boolean(),'Schedule reminder':z.boolean()}).nullable()}).refine(v=>(v.membership.role==='OWNER'?v.pilot!==null:v.pilot===null)&&(v.membership.role==='AGENT'?v.onboarding===null&&v.agency.processing_reference===null:v.onboarding!==null));
+export const settingsMemberSchema=z.object({id:z.uuid(),role,active:z.boolean(),display_name:name,email,version,created_at:stamp,lead_count:count,open_task_count:count});
+export const settingsInviteSchema=z.object({id:z.uuid(),email,role:z.enum(['ADMIN','AGENT']),state:z.enum(['PENDING','EXPIRED','CONSUMED','REVOKED']),expires_at:stamp,version,created_at:stamp,delivery_state:z.enum(['EMAIL_QUEUED','EMAIL_ACCEPTED','EMAIL_FAILED','LINK_ONLY','EMAIL_UNAVAILABLE']).optional()});
+const pagination=z.object({next_cursor:z.string().min(1).max(512).nullable()});
+export const settingsMemberPageSchema=z.object({members:z.array(settingsMemberSchema).max(25),pagination});
+export const settingsInvitePageSchema=z.object({invitations:z.array(settingsInviteSchema).max(25),pagination});
+export const settingsVersionReceipt=z.object({id:z.uuid(),version});
+export const settingsProfileReceipt=settingsVersionReceipt.extend({display_name:z.string().min(2).max(120)});
+export const settingsMemberReceipt=settingsVersionReceipt.extend({role,active:z.boolean(),affected_leads:count,affected_open_tasks:count});
+export const settingsOwnerReceipt=z.object({owner_member_id:z.uuid(),previous_owner_member_id:z.uuid()});

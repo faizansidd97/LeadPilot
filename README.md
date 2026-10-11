@@ -11,8 +11,8 @@ The interface is English. Customer inquiries can contain multilingual text; enab
 | Area | Status |
 | --- | --- |
 | P0–P7: foundation, CRM workflows, team, capture, AI modules and dashboard | Implemented and verified locally |
-| P8: hardening and release preparation | In progress; twenty-seven local slices verified, including Website integrations recovery, CSV import recovery, Leads inbox/Add lead recovery, Dashboard recovery, Follow-up queue recovery, Notifications inbox/badge recovery, AI/reply-draft recovery, Facts/duplicate-review recovery and authenticator setup UX |
-| Latest complete local regression | 759/759 tests pass |
+| P8: hardening and release preparation | In progress; twenty-eight local slices verified, including Settings recovery and invitation receipts, Website integrations recovery, CSV import recovery, Leads inbox/Add lead recovery, Dashboard recovery, Follow-up queue recovery, Notifications inbox/badge recovery, AI/reply-draft recovery, Facts/duplicate-review recovery and authenticator setup UX |
+| Latest complete local regression | 782/782 tests pass |
 | Backend and frontend type checks | Pass |
 | Constructed analysis / draft contract evaluations | 100 analysis cases and 56 draft cases pass |
 | Production build | Pass |
