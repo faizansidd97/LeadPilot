@@ -6,13 +6,13 @@ The interface is English. Customer inquiries can contain multilingual text; enab
 
 ## Current status
 
-**Development / pre-pilot — updated 10 October 2026.**
+**Development / pre-pilot — updated 11 October 2026.**
 
 | Area | Status |
 | --- | --- |
 | P0–P7: foundation, CRM workflows, team, capture, AI modules and dashboard | Implemented and verified locally |
-| P8: hardening and release preparation | In progress; twenty-six local slices verified, including CSV import recovery, Leads inbox/Add lead recovery, Dashboard recovery, Follow-up queue recovery, Notifications inbox/badge recovery, AI/reply-draft recovery, Facts/duplicate-review recovery and authenticator setup UX |
-| Latest complete local regression | 740/740 tests pass |
+| P8: hardening and release preparation | In progress; twenty-seven local slices verified, including Website integrations recovery, CSV import recovery, Leads inbox/Add lead recovery, Dashboard recovery, Follow-up queue recovery, Notifications inbox/badge recovery, AI/reply-draft recovery, Facts/duplicate-review recovery and authenticator setup UX |
+| Latest complete local regression | 759/759 tests pass |
 | Backend and frontend type checks | Pass |
 | Constructed analysis / draft contract evaluations | 100 analysis cases and 56 draft cases pass |
 | Production build | Pass |
@@ -250,6 +250,7 @@ Staging checks, platform monitoring, private AI diagnostics and key-rotation too
 | AI analysis and evaluations | [AI analysis](docs/AI_ANALYSIS.md), [analysis evaluation](docs/AI_EVALUATION.md) |
 | Reviewed drafts | [Reply drafts](docs/REPLY_DRAFTS.md), [draft evaluation](docs/REPLY_EVALUATION.md), [AI client recovery](docs/AI_CLIENT_RECOVERY.md) |
 | Metrics | [Dashboard](docs/DASHBOARD.md) |
+| Website integrations recovery | [Original save recovery and current signing receipts](docs/WEBSITE_INTEGRATION_RECOVERY.md) |
 | CSV import recovery | [File mapping, saved progress and safe batch reconciliation](docs/CSV_IMPORT_RECOVERY.md) |
 | Leads inbox and Add lead recovery | [Search, pagination, current opening and original save recovery](docs/LEAD_INBOX_RECOVERY.md) |
 | Dashboard recovery | [Metrics, date ranges, drilldown and latest lead opening](docs/DASHBOARD_RECOVERY.md) |
