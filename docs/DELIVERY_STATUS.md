@@ -30,4 +30,6 @@ The reviewed source has no advertised execution route behind the Privacy “unav
 
 12 October continuation: the user confirms that privacy policy is not yet decided. The offline developer tool now covers reviewed catalog metadata for 39 public/private tables and one view, with drift checks, declared relationships and opaque/shared/global scope concerns (PRIVACY_DATA_INVENTORY.md and PRIVACY_INVENTORY_TOOL.md). This advances independent preparation; it does not complete actual private row attribution, hosted Auth, function/expression behavior or external/provider/log/backup inventory, and it does not enable deletion/closure.
 
+Latest 12 October user decision: keep anonymous history instead of permanently deleting records. The next privacy design follows anonymization, including identifying content in related private/free-text copies. Retention durations, exact field treatment, backup handling and the other policy requirements remain unresolved; execution and agency closure remain unavailable. See PRIVACY_POLICY_REQUIREMENTS.md for the current decision record.
+
 No arbitrary price, retention period, provider, region, automated sending or release percentage was selected. The current phase report and future roadmap remain in PRODUCT_PLAN.md. This preparation is complete as a document; it does not complete the real release or pilot.

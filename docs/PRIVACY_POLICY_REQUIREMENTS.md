@@ -2,7 +2,9 @@
 
 This worksheet makes the remaining A22 implementation dependency concrete. It records requirements to decide; it is not an approved legal policy or a deletion authorization. Current Privacy supports request intake, identity-reference review, holds/history and a partial impact preview. It cannot erase leads, close agencies or replay deletions after restore.
 
-12 October 2026 user clarification: the policy has not been decided. No retention durations, permanent-deletion/anonymization choice or backup treatment is approved. Continue independent local preparation; execution remains unavailable until concrete policy requirements are supplied and implemented/tested.
+12 October 2026 latest user decision: retain anonymous history instead of permanently deleting records. This supersedes the earlier undecided deletion-mode answer. The product direction is anonymization; retention durations, field-level treatment, backup handling and the remaining decisions below are still unresolved. This preference does not approve a complete execution policy or enable execution.
+
+Anonymous history must no longer identify the customer. Implementation design must review direct identifiers and identifying content throughout messages, notes, revisions, facts, AI inputs/outputs, imports, replay/queue payloads and related copies; removing a name or hiding a record alone is insufficient. Define which non-identifying history can remain and how linkage and re-identification risks will be checked before implementation is accepted. These are design requirements to resolve, not an already implemented anonymizer.
 
 The project owner and appropriate privacy reviewer must provide a dated decision reference for these values before irreversible execution is designed. No fixed number of retention days, assumed residency or blanket retention exemption has been selected.
 
@@ -10,7 +12,7 @@ The project owner and appropriate privacy reviewer must provide a dated decision
 | --- | --- |
 | Processing authority and roles | Responsible agency/platform parties, notices/contracts, allowed data uses and any subprocessors |
 | Regions and transfers | Approved database/Auth/storage/log/provider/backup regions and permitted transfers |
-| Lead erasure result | Hard delete versus defined anonymization; field-level treatment, identity matching and what proof remains |
+| Lead erasure result | User selected anonymous history instead of permanent record deletion on 12 October 2026. Define field-level anonymization, identifying free-text/copy treatment, identity matching, retained non-identifying history and completion proof. |
 | Agency closure result | Membership/Auth ownership, revoked integrations/invitations, termination order, permitted post-closure access and user accounts shared with other agencies |
 | Retention by record class | Lead/contact/facts, messages and revisions, tasks, notifications, AI job/context/analysis/draft/feedback/attempts, activity/audit, imports, private replay/queue receipts, invitations and integration metadata |
 | Holds and conflicting cases | Who can create/release a hold, required evidence, scope, priority and when ordinary CRM/processing must stop |
