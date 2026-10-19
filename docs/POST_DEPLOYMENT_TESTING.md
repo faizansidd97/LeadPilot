@@ -31,15 +31,36 @@ The initial hosting-authentication blocker was resolved when the user completed 
 | Pipeline target | CORRECTED IN REPO PD-02 | Authenticated General settings verifies `lead-pilot` ID `prj_OgmYOFAbzoZgKirrCG5ASEE9974N`. The workflow and CI guide now bind this project instead of the earlier similarly named project. Preview activation remains disabled pending protected setup; this correction does not redeploy Production. |
 | Production checks | NOT CONFIGURED | Vercel Build and Deployment shows `No checks configured`. The development workflow does not gate native main production deployments; release checks/review remain a separate outstanding configuration. |
 
-Current status: **APPLICATION TESTING BLOCKED AT CONNECTED CONFIGURATION**. Hosting access and sample rendering are verified. Application login, authenticated API/data round-trips, persistence, tenant isolation, schema revision, workers/providers and complete desktop/mobile/accessibility acceptance are still untested. Do not record sample UI interactions as backend acceptance.
+Status at this point: **BLOCKED AT CONNECTED CONFIGURATION**. PD-01 was subsequently resolved by the explicitly authorized setup below. Sample UI interactions are not backend acceptance.
 
-Immediate remediation: configure the corresponding Supabase URL/publishable key and APP_URL in this project's **Production** environment, then create a new deployment with those values. Use the observed fixed origin `https://lead-pilot-five.vercel.app` for APP_URL and subsequent connected tests; mutations compare Origin to APP_URL, so the old per-deployment hostname is not interchangeable. Configure the matching Auth callback allowlist before callback/email verification. Existing deployments retain their old configuration; verify the replacement deployment and revision before resuming tests. Separate invitation/intake/worker secrets are required before those respective feature tests. No .env.local values were read or transferred by this testing pass.
+The requested remediation was to configure the corresponding Supabase URL/publishable key and APP_URL for **Production**, then create a replacement deployment. The initial inspection did not read or transfer .env.local values; the later user grant and completed setup are recorded below. Use the fixed origin `https://lead-pilot-five.vercel.app` for APP_URL and subsequent connected tests; mutations compare Origin to APP_URL, so per-deployment hostnames are not interchangeable. Auth callback allowlist verification and separate invitation/intake/worker configuration remain prerequisites for their respective tests.
+
+## Authorized Production setup and connected checks (19 October 2026)
+
+The user explicitly requested setup from existing local configuration in response to the three-variable Production setup/redeploy question. Only NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY were copied from local configuration, plus APP_URL set to the verified fixed origin. The URL/key were validated for public client use; no service-role, invitation, encryption, worker or AI secret was transferred. A filtered ignored temporary import file was removed after saving. Existing localhost/Supabase access restrictions remain unchanged.
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Production configuration / PD-01 | RESOLVED | Vercel's masked Environment Variables list and save confirmation show all three entries scoped to Production. The existing Corepack entry remains. |
+| Replacement deployment | PASS | One uncached Production redeploy completed Ready at 14:08 GMT+5: [ZcN65wRrqPNMU7GLnAUpuTasGbas](https://vercel.com/fazeeqa50-3737s-projects/lead-pilot/ZcN65wRrqPNMU7GLnAUpuTasGbas), deployment ID dpl_ZcN65wRrqPNMU7GLnAUpuTasGbas, unique hostname lead-pilot-qwr6luh3r-fazeeqa50-3737s-projects.vercel.app, unchanged main revision 61f9fe870cfafe064d48d86241ad6c25209ab8d3. No development-branch promotion was performed. |
+| Connected entry | PASS | [Stable application](https://lead-pilot-five.vercel.app/) returns HTTP 200 and renders Welcome to LeadPilot with Email/Password, Sign in, Create account and Reset password. The sample workspace is no longer rendered. This verifies configuration selection, not upstream Auth/database health. |
+| Signed-out membership gate | OBSERVED PASS | GET /api/v1/me/memberships returns 401 while signed out. This alone does not verify authenticated roles or RLS. |
+| Empty sign-in | PASS | Native required-field feedback appears on Email and the captured network events contain zero POST requests. |
+| Synthetic invalid sign-in / PD-03 | BLOCKER | Exactly one synthetic nonexistent-account attempt returns POST /api/v1/auth/sign-in HTTP 503, code AUTH_UNAVAILABLE, retryable true, Cache-Control private, no-store. Expected healthy invalid-credential behavior is HTTP 401 AUTH_FAILED. No actual user credentials or account creation were used. |
+| Error/recovery UI | PASS FOR OBSERVED FAILURE | Safe Authentication service is temporarily unavailable message appears, the form becomes enabled again and input is retained. Synthetic values were cleared after observation. No repeated login, reset or signup request was sent. |
+| Runtime correlation | VERIFIED | Vercel logs confirm the same POST 503 at 2026-10-19T09:09:30.938Z, request bz22z-1792400970938-30861ef8dbca, on the replacement deployment. Firewall allowed the request; the selected log has no upstream error detail. |
+
+Current status: **CONNECTED SIGN-IN BLOCKED BY AUTH_UNAVAILABLE (PD-03)**. The source maps retryable/malformed/upstream Auth failures to this safe 503; available evidence does not establish a specific cause. Supabase Active/Paused status was requested from the user. No direct Supabase probe, configuration change, migration or service restart was attempted. Do not replace the 503 with an invalid-credentials response to make the test pass.
+
+Proof screenshots are saved locally under backend/.cache/post-deployment/: production-env-saved.jpg (masked settings), connected-sign-in.jpg and auth-unavailable.jpg (cleared form). They are ignored artifacts, not public configuration/credential exports.
+
+Successful sign-in, authenticated API/data round-trips, persistence, tenant isolation, schema revision, callbacks/MFA, workers/providers and complete desktop/mobile/accessibility acceptance remain pending. Production checks remain unconfigured and protected development Preview remains disabled. A Ready deployment and green local CI do not establish those acceptance results.
 
 ## Access handoff history
 
 The initial in-app Vercel login was completed by the user. The connector's separate 403 alone does not establish which account/connection change would resolve API access. No secret, password, OTP or bypass token is requested in chat. Deployment Protection was preserved; browser authentication was sufficient to inspect the app and its non-secret deployment metadata.
 
-The user has now completed hosting login and project/revision/environment metadata is verified above. The next needed input is connected configuration for the intended testing database. Connector API access remains independent of the browser login and was not re-tested as if browser login granted API access.
+The user completed hosting login, authorized the three-variable setup and Production redeployment, and project/revision/environment metadata is verified above. The current diagnostic input is Supabase project availability; the connected Auth boundary still fails. Connector API access remains independent of browser login and was not re-tested as if browser login granted API access.
 
 ## Functional checks queued after access
 

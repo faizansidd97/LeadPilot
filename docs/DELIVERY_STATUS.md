@@ -22,6 +22,8 @@ After the user completed browser login, deployment details independently confirm
 
 ## Remaining dependencies in order
 
+19 October setup continuation: the user explicitly authorized copying the existing local public Supabase URL/publishable key and setting APP_URL for lead-pilot Production, followed by redeployment. Exactly those three variables were saved, with no private server secrets transferred. Replacement deployment dpl_ZcN65wRrqPNMU7GLnAUpuTasGbas is Ready on unchanged main 61f9fe8 and stable alias https://lead-pilot-five.vercel.app; sample mode is resolved. Connected sign-in renders, empty required-field validation sends no POST, and signed-out memberships return 401. One synthetic nonexistent-account sign-in instead returns 503 AUTH_UNAVAILABLE, confirmed by Vercel runtime logs. Root cause is not established; Supabase Active/Paused status was requested. Authenticated/persistence/isolation/provider acceptance remains blocked at this Auth boundary. See POST_DEPLOYMENT_TESTING.md for request correlation and limits. This authorized setup supersedes the preceding missing-configuration blocker without accepting a release.
+
 | Step | Concrete remaining work | Required input / existing preparation |
 | --- | --- | --- |
 | 1. Privacy implementation (A22) | Implement approved complete erasure/closure, private/external child handling, fencing and deletion replay after restore; currently unavailable | D02/D03 policy decisions in PRIVACY_POLICY_REQUIREMENTS.md. Existing case intake/review and partial impact are not the executor. Local development can resume on this dependency before hosting once approved requirements are supplied. |
