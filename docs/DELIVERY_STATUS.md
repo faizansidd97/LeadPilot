@@ -24,6 +24,8 @@ After the user completed browser login, deployment details independently confirm
 
 ## Remaining dependencies in order
 
+19 October authorized error-log follow-up: the configured Supabase log connector was accessible for the explicitly bounded 09:46:20Z–10:01:20Z window. No Auth/API gateway entries were returned; source discovery showed only 120 pooler events, which are not established errors. A safe error-category aggregate returned a connector backend error and was not retried. Public Supabase status reported operational, which does not establish this project's health. Internal cause remains unknown; project-specific service health/support diagnostics are needed before resuming hosted sign-in. No speculative code, SQL, credential, restart or support-message action was taken. POST_DEPLOYMENT_TESTING.md contains the bounded findings and escalation evidence.
+
 | Step | Concrete remaining work | Required input / existing preparation |
 | --- | --- | --- |
 | 1. Privacy implementation (A22) | Implement approved complete erasure/closure, private/external child handling, fencing and deletion replay after restore; currently unavailable | D02/D03 policy decisions in PRIVACY_POLICY_REQUIREMENTS.md. Existing case intake/review and partial impact are not the executor. Local development can resume on this dependency before hosting once approved requirements are supplied. |

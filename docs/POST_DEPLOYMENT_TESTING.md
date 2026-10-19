@@ -58,6 +58,22 @@ The user then explicitly permitted read-only Auth health/settings checks on the 
 
 This independently reproduces unavailability before a login submission and is consistent with the deployed app's safe 503. It establishes a failing configured Auth gateway boundary, not the internal service/database cause or a global Supabase outage. The next remediation step is project Auth/service-log investigation by an authorized operator, followed by a healthy Auth read before resuming sign-in acceptance. No further repeated probes, login, account creation, SQL, service restart, redeploy or access-setting change occurred. The grant was limited to these Auth reads; other existing restrictions remain unchanged.
 
+## Authorized service-log investigation (19 October 2026)
+
+The user separately authorized reading the configured project's previous 15 minutes of Auth/gateway error logs. The connector was queried with explicit bounds **2026-10-19T09:46:20Z to 2026-10-19T10:01:20Z** (14:46:20–15:01:20 Asia/Karachi), without extending the window or accessing another project.
+
+| Check | Actual result | Limit |
+| --- | --- | --- |
+| Auth/API gateway source counts | No rows for auth_logs or edge_logs | Absence in this connector/window is not proof of healthy Auth or absence of earlier errors. |
+| Available source discovery | Only pgbouncer_logs, 120 entries | These are connection-pooler events, not 120 demonstrated errors. No event text or identifiers were returned. |
+| Pooler attribute names | Runtime/sequence/host/project metadata keys only | Only key names/counts were selected, not their private values; they do not identify the cause. |
+| Bounded error-category aggregate | Connector returned a backend error | No raw events were requested as fallback, and the failed query was not polled/retried. No error category was established. |
+| Public service status | [Supabase Status](https://status.supabase.com/) reported fully operational at inspection | A global status page does not establish the configured project's health or exclude an unreported incident. |
+
+**Outcome: root cause remains unconfirmed.** The preceding direct Auth 502 and deployed login 503 remain the actionable evidence; these log results neither resolve nor contradict them. The next required evidence is project-specific Auth/service health or an internal diagnostic from Supabase support. Do not infer an invalid key, database password/permission failure, stopped Auth process, connection exhaustion or a global outage from these results, and do not apply speculative SQL/credential/service changes.
+
+Escalation evidence is already in this report: stable application origin, deployed revision/deployment ID, correlated Vercel request/time, two failing public Auth paths, safe upstream response classification and exact service-log window/results. An operator can supply the project reference and original Supabase request IDs privately through support. No support message was sent, no service was restarted, and no customer data, raw logs, tokens or keys were printed or committed. Application source and existing local verification evidence remain unchanged; hosted sign-in acceptance is still blocked.
+
 Proof screenshots are saved locally under backend/.cache/post-deployment/: production-env-saved.jpg (masked settings), connected-sign-in.jpg and auth-unavailable.jpg (cleared form). They are ignored artifacts, not public configuration/credential exports.
 
 Successful sign-in, authenticated API/data round-trips, persistence, tenant isolation, schema revision, callbacks/MFA, workers/providers and complete desktop/mobile/accessibility acceptance remain pending. Production checks remain unconfigured and protected development Preview remains disabled. A Ready deployment and green local CI do not establish those acceptance results.
@@ -66,7 +82,7 @@ Successful sign-in, authenticated API/data round-trips, persistence, tenant isol
 
 The initial in-app Vercel login was completed by the user. The connector's separate 403 alone does not establish which account/connection change would resolve API access. No secret, password, OTP or bypass token is requested in chat. Deployment Protection was preserved; browser authentication was sufficient to inspect the app and its non-secret deployment metadata.
 
-The user completed hosting login, authorized the three-variable setup and Production redeployment, reports the Supabase project is Active, and separately authorized scoped direct Auth reads. Those reads reproduce HTTP 502; project Auth/service logs remain needed to determine the internal cause. Connector API access remains independent of browser login and was not re-tested as if browser login granted API access.
+The user completed hosting login, authorized the three-variable setup and Production redeployment, reports the Supabase project is Active, and separately authorized scoped direct Auth reads and 15-minute error-log investigation. Direct reads reproduce HTTP 502; the log connector has no Auth/API gateway events in the inspected window and did not establish the cause. Further project-specific service diagnostics remain needed. Supabase log connector access succeeded; Vercel connector access remains independent of browser login and was not re-tested as if browser login granted API access.
 
 ## Functional checks queued after access
 
