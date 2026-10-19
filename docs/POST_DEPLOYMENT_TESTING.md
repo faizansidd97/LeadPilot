@@ -181,6 +181,33 @@ The first full local run passed 812 regressions and backend types, then failed o
 
 Ignored local evidence: backend/.cache/post-deployment/notification-navigation-mismatch.jpg and a minimized matching JSON record of heading, view parameter, focus and viewport. No real contact, factor, row identifier, cookie or raw authenticated response is committed.
 
+## Authorized Production promotion and PD-04 retest (19 October 2026)
+
+The user approved deploying the verified navigation correction and repeating the browser check. Verified origin/main had no divergent commits and the complete developement candidate had a successful push-triggered CI run [39243972208](https://github.com/faizansidd97/LeadPilot/actions/runs/39243972208). The PR-only workflow-runs connector returned no runs; the public GitHub Actions endpoint supplied the push-run evidence. Fast-forwarded main from 61f9fe8 to **5da28cdc52ad4c4740b1049c7b853a3a900e9d39** without force or a new merge commit. The local working branch remains developement.
+
+| Deployment boundary | Direct evidence |
+| --- | --- |
+| Verified target | Vercel lead-pilot in fazeeqa50-3737s-projects; existing Git integration deploys main to Production |
+| New deployment | **dpl_4xgpajgasj3PbTDg3Y6RQYefAogj**, Ready / Production / Current, Next.js, displayed duration **25 seconds** |
+| Exact source | main **5da28cd**, Fix notification navigation and lead dialog focus |
+| Stable origin | https://lead-pilot-five.vercel.app/; new unique host lead-pilot-g2xd0qgul-fazeeqa50-3737s-projects.vercel.app |
+| Production CI | [39245220881](https://github.com/faizansidd97/LeadPilot/actions/runs/39245220881), completed success on the same SHA; development CI also completed success |
+
+After deployment became Ready, reloaded the stable origin in the existing authenticated browser profile; no credential or cookie transfer was required. Repeated only the already-read outdated-notice journey, preserving the two unread notices.
+
+| Retest | Result / boundary |
+| --- | --- |
+| Inbox → current lead | Notification open and fresh lead/detail/messages/tasks/control/activity/assignment reads return 200; no captured non-GET request in the bounded, untruncated sample |
+| Destination while dialog is open | URL now view=Leads; current lead dialog renders with enabled close control |
+| Layout / keyboard | At 1280×720 the dialog fits within the viewport, dialog/panel horizontal overflow false; 12 successive Tab checks remain inside |
+| Escape close | Dialog closes, h1 is Leads, view=Leads, active element is DIV#workspace-content |
+| Full reload | Still view=Leads with Leads heading and one active lead; memberships/inbox/notification summary reads 200 and unread count remains two |
+| Runtime observability sample | Deployment-filtered Vercel Request Logs, Last 30 minutes, show Warning 0 / Error 0 / Fatal 0 and no more rows for that timeline. Tested stable-host workflow reads are 200; two earlier 401 membership rows on the unique deployment host are also present and are not hidden or attributed to this signed-in workflow. This is a short initial window, not long-term availability or delivery acceptance. |
+
+**PD-04 is resolved and browser-retested for the single-OWNER lead-notification/Escape/reload path on deployed 5da28cd.** The source-derived Team destination correction, all filter combinations, full mobile/screen-reader coverage and other role/agency flows are not established by this sample. Previous 759×668 keyboard/layout evidence is from the earlier deployment; this new sample uses the viewport above. MFA remains user-pending and was not changed by the agent. No CRM/notification/factor write, SQL migration, key/environment change, mail, provider call or worker dispatch occurred. The approved main promotion and automatic Production deployment are the external changes in this slice.
+
+Ignored proof: production-navigation-fix-ready.jpg, production-navigation-fix-runtime-errors.jpg and notification-navigation-fixed.json under backend/.cache/post-deployment/. The error-level filter explicitly returns No request logs found for the selected filters for this deployment/window. The JSON contains only viewport, tab containment, view/heading and focus metadata. The screenshots contain no application credentials. Drains and durable monitoring configuration were not inspected or changed. The local 812-test manifest remains valid for the unchanged source fingerprint; documentation-only evidence updates are committed separately on developement and are not another Production promotion. P8 remains IN PROGRESS / release NOT_READY for the remaining gates.
+
 ## Access handoff history
 
 The initial in-app Vercel login was completed by the user. The connector's separate 403 alone does not establish which account/connection change would resolve API access. No secret, password, OTP or bypass token is requested in chat. Deployment Protection was preserved; browser authentication was sufficient to inspect the app and its non-secret deployment metadata.
