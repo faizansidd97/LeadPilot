@@ -16,6 +16,8 @@ The [local privacy schema inventory](PRIVACY_DATA_INVENTORY.md) and [offline inv
 
 Development branch checks and protected Vercel Preview deployment are described in [CI_CD.md](CI_CD.md). Deployment activation and credentials are separate from committing the workflow.
 
+The current [post-deployment testing report](POST_DEPLOYMENT_TESTING.md) records the supplied live URL, actual access checks, pipeline target finding and functional tests waiting for authenticated access.
+
 ## Folder structure
 
 

@@ -14,6 +14,10 @@ Final full local verification passes 806/806 regressions, both package type chec
 
 The developement branch contains secret-free checks followed by a separately protected, initially disabled Vercel Preview job. The successful run https://github.com/faizansidd97/LeadPilot/actions/runs/39224768716 passes all seven verifier checks and 806 regressions; LOCAL_CHECKS.json is the exact downloaded artifact matching the current source. Git LF attributes fix OS-dependent inventory hashes; a timing-only fixture correction removes minute-rollover flakiness without changing rate limiting. Preview was skipped. Vercel token access, GitHub environment protection and Preview configuration/activation are still required; see CI_CD.md. No migration, hosted Auth/customer/worker/provider action, scheduler setup or production deployment was performed.
 
+## Post-deployment checks started (19 October 2026)
+
+The user supplied the lead-pilot deployment URL. The latest development CI run is green and GitHub reports a completed Vercel deployment on main. The testing browser reaches Vercel login before LeadPilot, and authorized metadata/protected fetch calls return 403. Functional app testing is blocked pending authenticated access; no hosted acceptance is claimed. The observed lead-pilot project name also differs from the pipeline target leadpilot and needs verified ID/environment reconciliation before activation. See POST_DEPLOYMENT_TESTING.md for exact evidence, access handoff and queued tests.
+
 ## Remaining dependencies in order
 
 | Step | Concrete remaining work | Required input / existing preparation |
