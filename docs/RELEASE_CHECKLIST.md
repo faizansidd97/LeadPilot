@@ -2,6 +2,8 @@
 
 P8 is **IN PROGRESS**. P0–P7 local implementation is preserved; P8's locally verified hardening/rotation slices do not grant hosted verification or release acceptance. P9 starts after release/partner/data boundaries are resolved, not because code exists.
 
+19 October application recovery slice: route/root-layout render boundaries and a missing-page view are implemented with fixed safe copy, explicit framework retry, canonical workspace navigation and uncertain-save guidance. APP_RECOVERY.md records scope and limits. Keep A24 mounted exception/retry, root-layout/CSP/style delivery, responsive/keyboard/screen-reader and hosted acceptance open; no browser injection or Production deployment is implied by compiler/regression checks.
+
 19 October MFA follow-up: user reports verification complete; two fresh stable-origin inventory GETs still show one unverified factor and recent false in the testing session, matching Setup unfinished. URL/outcome reconciliation is pending. This is not accepted MFA/A05 evidence and does not authorize agent factor reset/enrollment/verification. See POST_DEPLOYMENT_TESTING.md; the approved navigation correction remains deployed and passed.
 
 Build/revision evidence: LOCAL_CHECKS.json records actual runtime, timestamp, check results and a SHA-256 fingerprint of source/tests/scripts/migrations/config/lock files. LOCAL_LOAD_REPORT.json records the independent local workload. DEPENDENCY_AUDIT.json records advisory/lock evidence. Reviewer: automated local checks only; no human acceptance is recorded. Fixtures: synthetic PGlite Auth/users; no approved customer dataset. No browser, hosted migration, provider request, real email or deployment was performed during that local evidence run.

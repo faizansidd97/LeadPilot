@@ -1,0 +1,30 @@
+.document {margin: 0; background: #f6f8f5; color: #172c2a; font-family: Arial, Helvetica, sans-serif; font-size: 14px;}
+.screen, .screen * {box-sizing: border-box;}
+.screen {display: grid; place-items: center; min-width: 0; width: 100%; min-height: 100vh; min-height: 100dvh; margin: 0; padding: 40px 20px; background: #f6f8f5; color: #172c2a; font: 14px/1.7 Arial, Helvetica, sans-serif; overflow-wrap: anywhere;}
+.container {width: 100%; max-width: 580px;}
+.brand {display: inline-flex; align-items: center; gap: 9px; margin-bottom: 28px; color: #172c2a; font-size: 24px; font-weight: 700; text-decoration: none; line-height: 1.4;}
+.brand > span {display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: #266d57; color: #fff; font-size: 29px;}
+.brand small {border-radius: 4px; padding: 3px 5px; background: #eaf2ed; color: #266d57; font-size: 10px;}
+.card {padding: 32px; border: 1px solid #dce5df; border-radius: 16px; background: #fff; box-shadow: 0 12px 40px #172c2a08;}
+.eyebrow {color: #266d57; font-size: 10px; font-weight: 700; letter-spacing: 1.6px;}
+.card h1 {margin: 14px 0; font-size: clamp(25px, 5vw, 32px); line-height: 1.25; font-weight: 600; letter-spacing: -.7px;}
+.card p {margin: 0; color: #52645d; line-height: 1.7; font-size: 14px;}
+.notice {margin: 24px 0; padding: 17px 18px; border: 1px solid #d6e4d8; border-radius: 9px; background: #f3f7ef;}
+.notice h2 {margin: 0 0 7px; color: #172c2a; font-size: 14px; line-height: 1.5; font-weight: 600;}
+.notice p {font-size: 13px;}
+.actions {display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px;}
+.actions button, .actions a {display: inline-flex; justify-content: center; align-items: center; gap: 10px; min-height: 44px; max-width: 100%; padding: 11px 17px; border: 1px solid transparent; border-radius: 8px; font: 600 14px/1.5 Arial, Helvetica, sans-serif; text-decoration: none; text-align: center; white-space: normal; cursor: pointer;}
+.actions button, .actions .primary {background: #266d57; color: #fff;}
+.actions button:hover, .actions .primary:hover {background: #1f5948;}
+.actions .secondary {background: #fff; color: #266d57; border-color: #d6e0da;}
+.actions .secondary:hover {background: #f3f7ef;}
+.card .help {margin-top: 24px; font-size: 12px;}
+.screen :focus-visible {outline: 3px solid #266d57; outline-offset: 4px;}
+.card h1:focus {outline: none;}
+@media(max-width: 480px) {
+ .screen {padding: 24px 16px;}
+ .card {padding: 24px 20px;}
+ .brand {margin-bottom: 22px;}
+ .actions {flex-direction: column;}
+ .actions button, .actions a {width: 100%;}
+}

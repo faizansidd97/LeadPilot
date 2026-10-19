@@ -4,6 +4,8 @@ Reviewed on 19 October 2026. The user requested a developement branch and CI/CD 
 
 ## Implemented locally
 
+19 October further development: application route-render and root-layout recovery screens plus a missing-page screen are implemented independently of MFA/privacy policy. Fixed safe copy, an explicit framework render/refetch retry, canonical workspace navigation, a save-outcome warning and self-contained responsive/keyboard styles replace the generic failure UI. No exception details or failed URL are displayed and no business mutation is automatically replayed. Local verification is recorded in LOCAL_CHECKS.json; mounted failure injection and deployed acceptance remain pending. See APP_RECOVERY.md. Production remains the approved 5da28cd navigation correction until a new candidate is promoted.
+
 P0–P7 implementation is preserved: authenticated agencies/team/MFA, leads and lifecycle, conversations/revisions, follow-ups/notifications, manual/CSV/signed website capture, confirmed facts/duplicates, optional evidence-backed AI, reviewed replies and operational dashboard. P8 adds privacy request/review/holds/partial impact, security/role/read safeguards, durable worker/monitoring preparation, key rotation/restore tests and client recovery across the implemented workflows.
 
 The final client recovery pass includes Settings profile/team/invitation/agency/pilot/owner transfer and Operations/owner AI usage. Original uncertain Settings saves keep their original payload/key; acknowledged writes recover with reads only. Private links require current matching invitation state. Queue and usage refreshes hide unverified counts and fence duplicate/late reads. See SETTINGS_RECOVERY.md and OPERATIONS_RECOVERY.md.

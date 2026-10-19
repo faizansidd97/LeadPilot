@@ -1,8 +1,10 @@
 # Local and development verification evidence
 
-P8 first through thirtieth hardening slices and the post-deployment navigation source correction: locally verified; milestone/release status remains IN PROGRESS / NOT_READY.
+P8 first through thirtieth hardening slices, the navigation source correction and application recovery UI: locally verified; milestone/release status remains IN PROGRESS / NOT_READY.
 
-Latest synthetic verification recorded 2026-10-19T11:19:27.319Z on the local Windows workspace, Node v24.19.0. Source SHA-256 `61dd997d66fa523288890a99671d0763c1dcd27b49c4b10ffa4d77db83ca7917` covers 312 source/test/migration/script/config/lock files. LOCAL_CHECKS.json is the generated result of the complete passing verifier run, not a CI artifact or human sign-off. It verifies isolated application checks and compilation; the separately observed hosted navigation retest is recorded below.
+Latest synthetic verification recorded 2026-10-19T12:08:48.977Z on the local Windows workspace, Node v24.19.0. Source SHA-256 `8ec4b84802d3106966395f005aff770f40746f7e76d1beb3ba9873f5d31c1a9f` covers 317 source/test/migration/script/config/lock files. LOCAL_CHECKS.json is the generated result of the complete passing verifier run, not a CI artifact or human sign-off. It verifies isolated application checks and compilation. Application recovery is not yet deployed or browser-accepted; the earlier hosted navigation retest below applies only to Production 5da28cd.
+
+Application recovery continuation: implemented installed Next.js route and root-layout error boundaries plus a missing-page view. The shared standalone CSS-module view focuses its heading, wraps controls at narrow widths, uses fixed canonical workspace links, and offers only an explicit framework render/refetch retry. It never reads/displays/logs the caught exception or failed URL, nor automatically submits a business mutation. The save-outcome warning explicitly tells users to inspect current records before resubmitting and allows for lost unsaved input. Existing expected-error/replay handlers are unchanged. React review confirms stable hooks, no network effects/extra package imports and independent root-error document/style dependencies. No tests were added for presentation alone; the existing 812 regressions remain green and both type checks/contracts/privacy inventory/production build pass. Mounted error injection/retry/CSP/focus/screen-reader/responsive and hosted acceptance remain pending. No SQL/key/environment/provider/worker/account/MFA or deployment action occurred. See APP_RECOVERY.md.
 
 Earlier pipeline evidence remains historical: [successful CI run](https://github.com/faizansidd97/LeadPilot/actions/runs/39224768716), revision `5b8a33ae97a39f6e4e5df72f7f48a75f33934152`, Ubuntu 24.04 / Node v24.21.0, 806 tests, fingerprint `f6db0772278fc259ec09d8015a94f336a3fd8da8758b683ff7cc56e10d822081` / 310 files. Its downloaded artifact matched that revision; it does not verify the newer navigation correction. Preview was skipped pending activation/protected configuration. Full hosted/browser/release acceptance remains pending.
 
@@ -10,13 +12,13 @@ Current Production correction: after user approval, main fast-forwarded to **5da
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| regression | PASS | 812/812 tests; 192409 ms |
-| backend-types | PASS | Exit 0; 18756 ms |
-| frontend-types | PASS | Exit 0; 8600 ms |
-| analysis-contracts | PASS | 100 constructed contracts; 709 ms |
-| draft-contracts | PASS | 56 constructed contracts; 715 ms |
-| privacy-inventory | PASS | Exit 0; 9492 ms |
-| production-build | PASS | Exit 0; 48569 ms |
+| regression | PASS | 812/812 tests; 152499 ms |
+| backend-types | PASS | Exit 0; 11316 ms |
+| frontend-types | PASS | Exit 0; 3665 ms |
+| analysis-contracts | PASS | 100 constructed contracts; 616 ms |
+| draft-contracts | PASS | 56 constructed contracts; 532 ms |
+| privacy-inventory | PASS | Exit 0; 5739 ms |
+| production-build | PASS | Exit 0; 25498 ms |
 
 Initial PD-04 finding on main 61f9fe8: read-only opening of an already-read outdated notification loaded the current lead but left view=Notifications in the URL and Escape returned focus to BODY. The source correction uses shared navigation for Lead/Team destinations and restores a connected original trigger or current-workspace fallback. Six focus-target tests cover mounted, detached, missing, body and non-focusable targets; the focused navigation/notification/focus set passes 26/26. The React checklist found no new hook ordering, fetch waterfall, subscription or server/client boundary change; the direct helper import has no browser-global module initialization. Those tests do not mount React; the subsequent approved deployment and independent browser retest above resolve the specific lead path. The initial 759×668 / 12-Tab sample remains partial keyboard/layout evidence. No factor, notification, CRM, provider, worker or deployment write occurred in that initial finding slice. See POST_DEPLOYMENT_TESTING.md.
 
