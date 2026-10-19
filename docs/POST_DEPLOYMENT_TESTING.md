@@ -50,7 +50,7 @@ The user explicitly requested setup from existing local configuration in respons
 | Error/recovery UI | PASS FOR OBSERVED FAILURE | Safe Authentication service is temporarily unavailable message appears, the form becomes enabled again and input is retained. Synthetic values were cleared after observation. No repeated login, reset or signup request was sent. |
 | Runtime correlation | VERIFIED | Vercel logs confirm the same POST 503 at 2026-10-19T09:09:30.938Z, request bz22z-1792400970938-30861ef8dbca, on the replacement deployment. Firewall allowed the request; the selected log has no upstream error detail. |
 
-Current status: **CONNECTED SIGN-IN BLOCKED BY AUTH_UNAVAILABLE (PD-03)**. The source maps retryable/malformed/upstream Auth failures to this safe 503; available evidence does not establish a specific cause. The user reports the Supabase project is Active; this is user-confirmed status, not an independent Auth health check. Do not replace the 503 with an invalid-credentials response to make the test pass.
+Status before the recovery recorded below: **CONNECTED SIGN-IN BLOCKED BY AUTH_UNAVAILABLE (PD-03)**. The source maps retryable/malformed/upstream Auth failures to this safe 503; available evidence does not establish a specific cause. The user reports the Supabase project is Active; this is user-confirmed status, not an independent Auth health check. Do not replace the 503 with an invalid-credentials response to make the test pass.
 
 19 October diagnostic continuation: offline checks of the two authorized local public configuration fields confirm one definition each, HTTPS base URL with expected hosted Supabase hostname format, publishable key format and no whitespace. These checks do not validate the key against its project or prove hosted runtime connectivity. All 13 focused backend/tests/auth-recovery.test.ts checks pass using actual installed SDK error classes; invalid credentials map to 401 while upstream/transport/malformed responses remain 503. No application code was changed.
 
@@ -74,6 +74,21 @@ The user separately authorized reading the configured project's previous 15 minu
 
 Escalation evidence is already in this report: stable application origin, deployed revision/deployment ID, correlated Vercel request/time, two failing public Auth paths, safe upstream response classification and exact service-log window/results. An operator can supply the project reference and original Supabase request IDs privately through support. No support message was sent, no service was restarted, and no customer data, raw logs, tokens or keys were printed or committed. Application source and existing local verification evidence remain unchanged; hosted sign-in acceptance is still blocked.
 
+## Recovery after the user's Healthy status screenshot (19 October 2026)
+
+At approximately **10:16Z / 15:16 Asia/Karachi**, the user supplied a project-status screenshot showing all services, including Auth, Healthy. Visual project URL comparison matches the configured local public project URL; no URL/key change was needed. An initial comparison used a mistranscribed screenshot character and was discarded after viewing the original image; the corrected comparison matches.
+
+| Boundary | New direct evidence | Result / limit |
+| --- | --- | --- |
+| Public Auth health | GET /auth/v1/health returns 200 with GoTrue identity | PASS for current availability, not a durability guarantee. |
+| Public Auth settings | GET /auth/v1/settings returns 200, email enabled, mailer_autoconfirm false, disable_signup false | PASS for these public settings; email delivery is not tested. |
+| Deployed app → Auth | Exactly one new synthetic nonexistent-account attempt at the stable application origin returns 401 AUTH_FAILED, retryable false | Expected invalid-credentials behavior; the previous 503 is no longer reproduced by this path. |
+| Response → UI | Check your credentials and verify your email appears; controls become enabled again | Expected safe generic denial. Synthetic values were cleared; page reload returns to the signed-out Sign in with a verified email screen. |
+
+**Current status: PD-03 AVAILABILITY RECOVERED; REAL-ACCOUNT SIGN-IN PENDING.** The internal outage/recovery cause remains unknown. No agent restart, Auth setting change, migration, credential replacement, source fix or new deployment caused this observed recovery. Historical failures/log limits remain recorded above; no permanent resolution is claimed.
+
+Screenshots are ignored local artifacts at backend/.cache/post-deployment/auth-recovered-invalid-credentials.jpg and auth-recovered-sign-in.jpg. The browser is left on the stable sign-in page for the user to authenticate using their existing verified account. No actual password/OTP was requested in chat, and no account was created, reset or signed in successfully by the agent. Authenticated membership/workspace loading, persistence and subsequent acceptance still require verification.
+
 Proof screenshots are saved locally under backend/.cache/post-deployment/: production-env-saved.jpg (masked settings), connected-sign-in.jpg and auth-unavailable.jpg (cleared form). They are ignored artifacts, not public configuration/credential exports.
 
 Successful sign-in, authenticated API/data round-trips, persistence, tenant isolation, schema revision, callbacks/MFA, workers/providers and complete desktop/mobile/accessibility acceptance remain pending. Production checks remain unconfigured and protected development Preview remains disabled. A Ready deployment and green local CI do not establish those acceptance results.
@@ -82,7 +97,7 @@ Successful sign-in, authenticated API/data round-trips, persistence, tenant isol
 
 The initial in-app Vercel login was completed by the user. The connector's separate 403 alone does not establish which account/connection change would resolve API access. No secret, password, OTP or bypass token is requested in chat. Deployment Protection was preserved; browser authentication was sufficient to inspect the app and its non-secret deployment metadata.
 
-The user completed hosting login, authorized the three-variable setup and Production redeployment, reports the Supabase project is Active, and separately authorized scoped direct Auth reads and 15-minute error-log investigation. Direct reads reproduce HTTP 502; the log connector has no Auth/API gateway events in the inspected window and did not establish the cause. Further project-specific service diagnostics remain needed. Supabase log connector access succeeded; Vercel connector access remains independent of browser login and was not re-tested as if browser login granted API access.
+The user completed hosting login, authorized the three-variable setup and Production redeployment, reports the Supabase project is Active, and separately authorized scoped direct Auth reads and 15-minute error-log investigation. Initial reads reproduced 502 and logs did not establish the cause; the later Healthy screenshot and fresh 200/expected-401 results establish current availability recovery. The active handoff is real-account sign-in by the user before authenticated workspace verification. Supabase log connector access succeeded; Vercel connector access remains independent of browser login and was not re-tested as if browser login granted API access.
 
 ## Functional checks queued after access
 

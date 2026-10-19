@@ -24,6 +24,8 @@ After the user completed browser login, deployment details independently confirm
 
 ## Remaining dependencies in order
 
+19 October recovery after user Healthy screenshot, approximately 15:16 Asia/Karachi: current configured Auth health and settings both return 200. The stable deployed app now returns expected 401 AUTH_FAILED for one synthetic nonexistent-account attempt, instead of the earlier 503. The availability failure is no longer reproduced; its internal cause/recovery action remains unknown, and no agent restart/configuration/code/deployment change was made. Real verified-account sign-in and authenticated workspace acceptance remain pending user authentication. POST_DEPLOYMENT_TESTING.md records current evidence and preserves the earlier failures. The next live step is successful real-account login, followed by scoped workspace/API verification.
+
 19 October authorized error-log follow-up: the configured Supabase log connector was accessible for the explicitly bounded 09:46:20Z–10:01:20Z window. No Auth/API gateway entries were returned; source discovery showed only 120 pooler events, which are not established errors. A safe error-category aggregate returned a connector backend error and was not retried. Public Supabase status reported operational, which does not establish this project's health. Internal cause remains unknown; project-specific service health/support diagnostics are needed before resuming hosted sign-in. No speculative code, SQL, credential, restart or support-message action was taken. POST_DEPLOYMENT_TESTING.md contains the bounded findings and escalation evidence.
 
 | Step | Concrete remaining work | Required input / existing preparation |
