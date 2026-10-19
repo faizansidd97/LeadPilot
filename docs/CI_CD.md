@@ -10,6 +10,8 @@ This job uses synthetic isolated databases and no application/deployment secrets
 
 Official actions are pinned to full SHAs resolved from their v6 tags on 19 October. Checkout does not persist credentials. Permissions are `contents: read`; CI does not push generated evidence or comment/merge/change databases. New runs cancel superseded runs for the same workflow/ref.
 
+Git attributes enforce LF for tracked text on Windows and Linux. The first hosted run passed 806 regressions, both type checks and both contract suites, then exposed an inventory migration checksum saved from mixed Windows line endings. The regenerated inventory binds canonical Git LF migration bytes; reviewed schema fingerprints and SQL content are unchanged. Full hosted verification after that correction is tracked by the Actions run, not inferred from the earlier partial run.
+
 ## Protected Preview deployment
 
 After CI passes, a push/manual run on `developement` can deploy to Vercel Preview. PRs, forks and `main` cannot enter this job. It is disabled until repository variable `VERCEL_PREVIEW_DEPLOY_ENABLED` equals `true`.
