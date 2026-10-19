@@ -49,6 +49,21 @@ jobs:
           node --input-type=module -e "import {rmSync} from 'node:fs'; rmSync('../docs/LOCAL_CHECKS.json', {force: true});"
           node scripts/verify-local.mjs
 
+      - name: Show failed synthetic check output
+        if: ${{ failure() && steps.checks.outcome == 'failure' }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync, existsSync} from 'node:fs';
+          if (existsSync('docs/LOCAL_CHECKS.json')) {
+            const report = JSON.parse(readFileSync('docs/LOCAL_CHECKS.json', 'utf8'));
+            for (const check of report.checks.filter(check => check.status === 'FAIL')) {
+              if (!/^[a-z-]+$/.test(check.name)) throw new Error('Unexpected check name.');
+              console.log(`Failed check: ${check.name}`);
+              console.log(readFileSync(`backend/.cache/p8-verification/${check.name}.log`, 'utf8').slice(-16000));
+            }
+          }
+          NODE
+
       - name: Save synthetic verification manifest
         if: ${{ !cancelled() && steps.checks.outcome != 'skipped' }}
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6

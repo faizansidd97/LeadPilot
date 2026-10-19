@@ -6,7 +6,7 @@ Added 19 October 2026 at the user's request. The branch is `developement`. `.git
 
 Pushes to `developement` or `main`, pull requests targeting either, and manual runs execute **Tests, types, contracts and build** on Ubuntu 24.04, Node 24 and pnpm 11.25.0. The frozen `frontend/pnpm-lock.yaml` installs both packages. The existing full verifier runs regressions, backend/frontend types, constructed analysis/draft contracts, saved privacy inventory verification and the production build.
 
-This job uses synthetic isolated databases and no application/deployment secrets. It does not connect to Supabase, send mail or run provider jobs. A fresh verification manifest is uploaded for seven days; the checked-in manifest is removed first so an early failure cannot publish an old PASS. Environment files, deployment output and browser state are never uploaded.
+This job uses synthetic isolated databases and no application/deployment secrets. It does not connect to Supabase, send mail or run provider jobs. A fresh verification manifest is uploaded for seven days; the checked-in manifest is removed first so an early failure cannot publish an old PASS. On verification failure the last bounded portion of that failed synthetic check's log is printed for diagnosis. Environment files, deployment output and browser state are never uploaded.
 
 Official actions are pinned to full SHAs resolved from their v6 tags on 19 October. Checkout does not persist credentials. Permissions are `contents: read`; CI does not push generated evidence or comment/merge/change databases. New runs cancel superseded runs for the same workflow/ref.
 
