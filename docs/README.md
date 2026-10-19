@@ -14,6 +14,8 @@ The current handoff is in [DELIVERY_STATUS.md](DELIVERY_STATUS.md). Remaining pr
 
 The [local privacy schema inventory](PRIVACY_DATA_INVENTORY.md) and [offline inventory tool](PRIVACY_INVENTORY_TOOL.md) cover reviewed public/private metadata and identify opaque/shared/indirect dependencies. Full data inventory, policy and execution remain pending; no customer values or remote configuration are read by this developer tool.
 
+Development branch checks and protected Vercel Preview deployment are described in [CI_CD.md](CI_CD.md). Deployment activation and credentials are separate from committing the workflow.
+
 ## Folder structure
 
 

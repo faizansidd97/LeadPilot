@@ -1,0 +1,153 @@
+name: LeadPilot CI and Preview
+
+on:
+  push:
+    branches: [main, developement]
+  pull_request:
+    branches: [main, developement]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: leadpilot-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: 'true'
+  NEXT_TELEMETRY_DISABLED: '1'
+
+jobs:
+  verify:
+    name: Tests, types, contracts and build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out this revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.x'
+          package-manager-cache: false
+
+      - name: Install pinned pnpm
+        run: npm install --global pnpm@11.25.0
+
+      - name: Install both workspace packages
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify regressions, both type checks, contracts, inventory and build
+        id: checks
+        working-directory: backend
+        run: |
+          node --input-type=module -e "import {rmSync} from 'node:fs'; rmSync('../docs/LOCAL_CHECKS.json', {force: true});"
+          node scripts/verify-local.mjs
+
+      - name: Save synthetic verification manifest
+        if: ${{ !cancelled() && steps.checks.outcome != 'skipped' }}
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: local-checks-${{ github.sha }}
+          path: docs/LOCAL_CHECKS.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Explain disabled deployment
+        if: github.ref == 'refs/heads/developement' && vars.VERCEL_PREVIEW_DEPLOY_ENABLED != 'true'
+        run: echo 'Checks completed. Preview deployment is disabled until the protected preview-deploy environment and Vercel credentials are configured; see docs/CI_CD.md.'
+
+  preview:
+    name: Deploy verified development preview
+    needs: verify
+    if: >-
+      github.repository == 'faizansidd97/LeadPilot' &&
+      github.event_name != 'pull_request' &&
+      github.ref == 'refs/heads/developement' &&
+      vars.VERCEL_PREVIEW_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    environment:
+      name: preview-deploy
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      VERCEL_ORG_ID: team_oALUEwZbzxonide0Y16W4mkr
+      VERCEL_PROJECT_ID: prj_uPXy3tjLwI2dGfXDM42lmffPLe8K
+    steps:
+      - name: Check out the verified revision
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24.x'
+          package-manager-cache: false
+
+      - name: Install pinned build tools
+        run: npm install --global pnpm@11.25.0 vercel@64.3.1
+
+      - name: Pull the approved project's Preview configuration
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo '::error::Add VERCEL_TOKEN to the protected preview-deploy environment.'
+            exit 1
+          fi
+          vercel pull --yes --environment=preview --git-branch=developement --scope "$VERCEL_ORG_ID"
+
+      - name: Verify project identity and monorepo root
+        run: |
+          node --input-type=module <<'NODE'
+          import {readFileSync} from 'node:fs';
+          const project = JSON.parse(readFileSync('.vercel/project.json', 'utf8'));
+          if (project.orgId !== process.env.VERCEL_ORG_ID ||
+              project.projectId !== process.env.VERCEL_PROJECT_ID ||
+              project.settings?.rootDirectory !== 'frontend') {
+            console.error('Vercel target mismatch: expected the approved LeadPilot project with frontend as Root Directory.');
+            process.exit(1);
+          }
+          NODE
+
+      - name: Build the Preview artifact
+        run: vercel build --yes
+
+      - name: Deploy the built Preview artifact
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          deployment_url="$(vercel deploy --prebuilt --yes --scope "$VERCEL_ORG_ID")"
+          export DEPLOYMENT_URL="$deployment_url"
+          node --input-type=module <<'NODE'
+          import {appendFileSync} from 'node:fs';
+          const value = process.env.DEPLOYMENT_URL;
+          const url = new URL(value);
+          if (url.protocol !== 'https:' || url.origin !== value ||
+              !url.hostname.endsWith('.vercel.app') || url.username || url.password) {
+            throw new Error('Unexpected Preview deployment URL.');
+          }
+          appendFileSync(process.env.GITHUB_OUTPUT, `url=${value}\n`);
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+            `Preview: ${value}\n\nRevision: ${process.env.GITHUB_SHA}\n\nHosted acceptance is pending.\n`);
+          NODE
+
+      - name: Remove pulled environment files and build output
+        if: ${{ always() }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {rmSync} from 'node:fs';
+          for (const path of ['.vercel', 'frontend/.vercel']) {
+            rmSync(path, {recursive: true, force: true});
+          }
+          NODE

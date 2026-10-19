@@ -85,6 +85,10 @@ User requests use verified cookie identity, active agency membership and Supabas
 | Local database verification | PGlite with isolated fixtures |
 | Package workspace | pnpm; lockfile and workspace configuration live in `frontend` |
 
+## CI/CD
+
+The `developement` branch has a [GitHub Actions pipeline](.github/workflows/ci.yml) for full tests, both type checks, contracts, privacy inventory verification and build. A separate protected job can deploy the verified revision to Vercel Preview. Deployment stays disabled until the reviewer, Vercel token and Preview settings are configured; see the [CI/CD setup guide](docs/CI_CD.md). This workflow does not deploy production or run migrations.
+
 ## Local setup
 
 ### 1. Requirements
