@@ -6,7 +6,7 @@ Started 19 October 2026 at the user's request, specifically for the supplied dep
 
 Story: open the deployed application, sign in, load the authorized agency through the API, and verify that records/actions render and persist with the correct access boundaries. This report records actual observations; the application journey has not yet passed.
 
-## Initial evidence
+## Initial evidence (before the user's Vercel login)
 
 | Check | Result | Observed evidence and limit |
 | --- | --- | --- |
@@ -17,13 +17,29 @@ Story: open the deployed application, sign in, load the authorized agency throug
 | Authorized deployment metadata | BLOCKED | Vercel deployment API returned HTTP 403 for team `fazeeqa50-3737s-projects`. The authorized protected-URL fetch also returned 403 at `read_protection_bypass`; no alternate account or access rule was used. No authenticated local Vercel CLI was available as a fallback. |
 | Pipeline target consistency | OPEN FINDING | The supplied deployment/dashboard identifies project `lead-pilot`. The development workflow currently binds the previously discovered `leadpilot` project ID `prj_uPXy3tjLwI2dGfXDM42lmffPLe8K`. Confirm the intended project's ID/branch/environment before activating Preview deployment; a similarly named project must not be treated as the same target. No binding was changed without verified metadata. |
 
-Status: **APPLICATION TESTING BLOCKED AT HOSTING AUTHENTICATION**. Application rendering, account login, connected API/data, schema revision, worker scheduling, provider transport and browser acceptance remain unverified. A Vercel completion status or green CI cannot establish those outcomes.
+The initial hosting-authentication blocker was resolved when the user completed Vercel login in the testing browser. The current blocker is described below; the initial observations are preserved as history.
 
-## Access needed to continue
+## Continuation after the user's login (19 October 2026)
 
-The in-app Vercel login tab is left available for the user to complete authentication. Alternatively, update the Vercel connector's access to the intended project/team, then confirm it can retrieve this deployment. The connector's error alone does not establish which account/connection change will resolve access. No secret, password, OTP or bypass token is requested in chat. Do not disable Deployment Protection to make this check pass.
+| Check | Result | Direct browser evidence |
+| --- | --- | --- |
+| Hosting access | PASS | The exact supplied deployment now opens LeadPilot in the in-app browser using the user's existing Vercel authentication. No protection setting was disabled. |
+| Deployed revision and target | VERIFIED | Vercel Deployment Details shows Ready, Production, main revision `61f9fe870cfafe064d48d86241ad6c25209ab8d3`, and fixed domain `https://lead-pilot-five.vercel.app`. This is the deployment supplied by the user, not the newer developement branch. |
+| Build settings | VERIFIED | Authenticated settings show Next.js, frontend root, outside-root source inclusion enabled, Node 24.x and install command `npx --yes pnpm@11.25.0 install --frozen-lockfile`. No build setting was changed. |
+| Application entry | SAMPLE UI ONLY | The rendered banner states `Sample data preview · Changes last for this session. Authentication and database are not connected.` The displayed agency/records are sample fixtures, not proof of connected Auth or persisted CRM data. |
+| Connected configuration | BLOCKER PD-01 | The project's Environment Variables tab, with all types/environments selected, displays only `ENABLE_EXPERIMENTAL_COREPACK` for Production and Preview. No Supabase URL/publishable-key entries are visible. Repository Page selects the sample Workspace when either NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY is absent; therefore backend-connected acceptance cannot begin. Values were not revealed or copied. |
+| Pipeline target | CORRECTED IN REPO PD-02 | Authenticated General settings verifies `lead-pilot` ID `prj_OgmYOFAbzoZgKirrCG5ASEE9974N`. The workflow and CI guide now bind this project instead of the earlier similarly named project. Preview activation remains disabled pending protected setup; this correction does not redeploy Production. |
+| Production checks | NOT CONFIGURED | Vercel Build and Deployment shows `No checks configured`. The development workflow does not gate native main production deployments; release checks/review remain a separate outstanding configuration. |
 
-After access is available, first confirm the exact deployed revision, project ID, target environment and testing database. Resolve the pipeline target finding before enabling deployment automation.
+Current status: **APPLICATION TESTING BLOCKED AT CONNECTED CONFIGURATION**. Hosting access and sample rendering are verified. Application login, authenticated API/data round-trips, persistence, tenant isolation, schema revision, workers/providers and complete desktop/mobile/accessibility acceptance are still untested. Do not record sample UI interactions as backend acceptance.
+
+Immediate remediation: configure the corresponding Supabase URL/publishable key and APP_URL in this project's **Production** environment, then create a new deployment with those values. Use the observed fixed origin `https://lead-pilot-five.vercel.app` for APP_URL and subsequent connected tests; mutations compare Origin to APP_URL, so the old per-deployment hostname is not interchangeable. Configure the matching Auth callback allowlist before callback/email verification. Existing deployments retain their old configuration; verify the replacement deployment and revision before resuming tests. Separate invitation/intake/worker secrets are required before those respective feature tests. No .env.local values were read or transferred by this testing pass.
+
+## Access handoff history
+
+The initial in-app Vercel login was completed by the user. The connector's separate 403 alone does not establish which account/connection change would resolve API access. No secret, password, OTP or bypass token is requested in chat. Deployment Protection was preserved; browser authentication was sufficient to inspect the app and its non-secret deployment metadata.
+
+The user has now completed hosting login and project/revision/environment metadata is verified above. The next needed input is connected configuration for the intended testing database. Connector API access remains independent of the browser login and was not re-tested as if browser login granted API access.
 
 ## Functional checks queued after access
 

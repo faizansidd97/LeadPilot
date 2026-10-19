@@ -21,11 +21,13 @@ After CI passes, a push/manual run on `developement` can deploy to Vercel Previe
 | Target | Checked non-secret identifier |
 | --- | --- |
 | Team | `team_oALUEwZbzxonide0Y16W4mkr` (`fazeeqa50-3737s-projects`) |
-| Existing LeadPilot project | `prj_uPXy3tjLwI2dGfXDM42lmffPLe8K` |
+| Verified live `lead-pilot` project | `prj_OgmYOFAbzoZgKirrCG5ASEE9974N` |
 | Root Directory | `frontend` |
 | Environment | Vercel Preview / GitHub `preview-deploy` |
 
 The job checks out the exact verified revision, installs pinned Vercel CLI 64.3.1, pulls Preview settings including `developement` overrides, verifies the linked team/project/root, runs `vercel build` from the repository root and uploads that artifact with `vercel deploy --prebuilt`. No production command or promotion is present. The validated HTTPS `.vercel.app` URL appears in the job summary/environment; it is not hosted acceptance evidence.
+
+Post-deployment correction, 19 October: after the user completed Vercel login, the authenticated `lead-pilot` General settings displayed the project ID above. The supplied deployment is Ready, Production, main revision `61f9fe8`, with fixed alias `lead-pilot-five.vercel.app`; build settings confirm frontend root, Node 24 and outside-root inclusion. The workflow was corrected from the earlier similarly named `leadpilot` project to this verified live project. This repository correction does not activate Preview or alter the deployed Production app. The live app is currently sample-only because the project's variable list contains only Corepack, without the required Supabase URL/publishable key; connected acceptance remains blocked.
 
 `VERCEL_TOKEN` is an environment secret supplied only to pull/deploy steps, never a command argument. Pulled application credentials are available to the reviewed Preview build; use testing credentials. Cleanup removes generated `.vercel` directories even after failure; Git also ignores them.
 

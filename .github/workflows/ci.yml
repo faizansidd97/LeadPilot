@@ -92,7 +92,7 @@ jobs:
       url: ${{ steps.deploy.outputs.url }}
     env:
       VERCEL_ORG_ID: team_oALUEwZbzxonide0Y16W4mkr
-      VERCEL_PROJECT_ID: prj_uPXy3tjLwI2dGfXDM42lmffPLe8K
+      VERCEL_PROJECT_ID: prj_OgmYOFAbzoZgKirrCG5ASEE9974N
     steps:
       - name: Check out the verified revision
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6

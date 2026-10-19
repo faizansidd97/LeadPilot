@@ -18,6 +18,8 @@ The developement branch contains secret-free checks followed by a separately pro
 
 The user supplied the lead-pilot deployment URL. The latest development CI run is green and GitHub reports a completed Vercel deployment on main. The testing browser reaches Vercel login before LeadPilot, and authorized metadata/protected fetch calls return 403. Functional app testing is blocked pending authenticated access; no hosted acceptance is claimed. The observed lead-pilot project name also differs from the pipeline target leadpilot and needs verified ID/environment reconciliation before activation. See POST_DEPLOYMENT_TESTING.md for exact evidence, access handoff and queued tests.
 
+After the user completed browser login, deployment details independently confirmed Ready/Production/main 61f9fe8 and fixed alias lead-pilot-five.vercel.app. General settings supplied the real lead-pilot project ID, now corrected in the workflow/guide. Build settings are correct, but the deployed application displays the explicit sample-only banner and the project's variable list shows only Corepack. Connected Auth/CRM testing is now blocked on Supabase URL/publishable key and APP_URL being configured for Production plus a replacement deployment. Browser access is resolved; live data, callbacks, persistence, isolation and release acceptance remain pending. No private values or customer records were accessed, no environment was changed and no redeployment was performed by this check.
+
 ## Remaining dependencies in order
 
 | Step | Concrete remaining work | Required input / existing preparation |
