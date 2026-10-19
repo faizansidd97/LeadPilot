@@ -1,18 +1,24 @@
 # Local and development verification evidence
 
-P8 first through thirtieth hardening slices: locally verified; milestone/release status remains IN PROGRESS / NOT_READY.
+P8 first through thirtieth hardening slices and the post-deployment navigation source correction: locally verified; milestone/release status remains IN PROGRESS / NOT_READY.
 
-Latest synthetic verification recorded 2026-10-19T08:45:05.930Z on GitHub Actions Ubuntu 24.04, Node v24.21.0: [successful CI run](https://github.com/faizansidd97/LeadPilot/actions/runs/39224768716), revision `5b8a33ae97a39f6e4e5df72f7f48a75f33934152`. Source SHA-256 `f6db0772278fc259ec09d8015a94f336a3fd8da8758b683ff7cc56e10d822081` covers 310 source/test/migration/script/config/lock files and matches the current LF checkout. LOCAL_CHECKS.json is the exact downloaded run artifact, verified against its published ZIP SHA-256. This verifies the pipeline and isolated application checks, not a running hosted application. Preview deployment was skipped pending activation/protected configuration; full hosted/browser/release acceptance remains pending.
+Latest synthetic verification recorded 2026-10-19T11:19:27.319Z on the local Windows workspace, Node v24.19.0. Source SHA-256 `61dd997d66fa523288890a99671d0763c1dcd27b49c4b10ffa4d77db83ca7917` covers 312 source/test/migration/script/config/lock files. LOCAL_CHECKS.json is the generated result of the complete passing verifier run, not a CI artifact or human sign-off. This verifies isolated application checks and compilation; the corrected mounted/deployed navigation journey remains unverified.
+
+Earlier pipeline evidence remains historical: [successful CI run](https://github.com/faizansidd97/LeadPilot/actions/runs/39224768716), revision `5b8a33ae97a39f6e4e5df72f7f48a75f33934152`, Ubuntu 24.04 / Node v24.21.0, 806 tests, fingerprint `f6db0772278fc259ec09d8015a94f336a3fd8da8758b683ff7cc56e10d822081` / 310 files. Its downloaded artifact matched that revision; it does not verify the newer navigation correction. Preview was skipped pending activation/protected configuration. Production remains main 61f9fe8; full hosted/browser/release acceptance remains pending.
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| regression | PASS | 806/806 tests; 75107 ms |
-| backend-types | PASS | Exit 0; 4473 ms |
-| frontend-types | PASS | Exit 0; 5538 ms |
-| analysis-contracts | PASS | Exit 0; 177 ms |
-| draft-contracts | PASS | Exit 0; 173 ms |
-| privacy-inventory | PASS | Exit 0; 2250 ms |
-| production-build | PASS | Exit 0; 15068 ms |
+| regression | PASS | 812/812 tests; 192409 ms |
+| backend-types | PASS | Exit 0; 18756 ms |
+| frontend-types | PASS | Exit 0; 8600 ms |
+| analysis-contracts | PASS | 100 constructed contracts; 709 ms |
+| draft-contracts | PASS | 56 constructed contracts; 715 ms |
+| privacy-inventory | PASS | Exit 0; 9492 ms |
+| production-build | PASS | Exit 0; 48569 ms |
+
+Post-deployment PD-04: read-only opening of an already-read outdated notification successfully loads the current lead, but the live UI leaves view=Notifications in the URL and Escape returns focus to BODY. The source now uses shared navigation for Lead/Team destinations and restores focus to a connected original trigger or the current workspace fallback. Six new focus-target tests cover mounted, detached, missing, body and non-focusable targets; the focused navigation/notification/focus set passes 26/26. The React checklist found no new hook ordering, fetch waterfall, subscription or server/client boundary change; the direct helper import has no browser-global module initialization. These tests do not mount the corrected React flow. Production PD-04 remains open pending deployment/retest. Narrow live dialog layout (759×668) and 12 trapped Tab steps are partial keyboard/layout evidence only. MFA remains unfinished; no factor, notification, CRM, provider, worker or deployment write occurred in this slice. See POST_DEPLOYMENT_TESTING.md.
+
+The initial full run passed 812 regressions/backend types but failed frontend types on a pre-existing duplicate fragment in generated .next/dev/types/validator.ts. Only that ignored generated file was quarantined; official Next typegen failed from repository cwd on a relative backend config import, then succeeded from frontend cwd. Standalone frontend types and the complete verifier rerun above passed. Generated next-env.d.ts path churn is restored separately; no TS exclusion/check was weakened.
 
 Account-security presentation correction: confirmed empty factor inventories now show prominent setup onboarding; selector/code entry appears only with an available factor. QR/manual-key instructions, unfinished setup recovery and unavailable/loading states are explicit in Profile and inline Privacy. Existing enrollment preflight, uncertain-outcome fencing and fresh verification remain unchanged. All local checks above pass after this UI change; no new tests were added for presentation alone, and no mounted browser or hosted enrollment acceptance is claimed. SQL stays 001–023. See PRIVACY_RECOVERY.md.
 

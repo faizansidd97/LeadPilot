@@ -161,11 +161,31 @@ Proof screenshots are saved locally under backend/.cache/post-deployment/: produ
 
 Initial create submission/acknowledgement, other mutation/recovery paths, cross-agency/role isolation, hosted schema revision, callbacks/MFA, workers/providers and complete desktop/mobile/accessibility acceptance remain pending. Production checks remain unconfigured and protected development Preview remains disabled. The one-agency read-only and disposable archive checks do not establish those remaining results.
 
+## Notification navigation and dialog keyboard finding (19 October 2026)
+
+Continued the authorized read-only checks in the same signed-in OWNER session after the user asked to check further modules. MFA remains unfinished; no code, QR or secret was read, and no factor action was submitted.
+
+| Check | Direct result | Boundary |
+| --- | --- | --- |
+| Already-read outdated notification → latest lead | GET notification open and current scoped lead/detail reads return 200; the current lead opens. The bounded captured open flow contains no non-GET request; unread count remains two | Used an already-read notice because opening an unread notice marks it read. No notification write was requested. |
+| AI analysis | Analysis history GET 200, No analysis yet; Analyze inquiry disabled with configuration/approval/limit notice | Read rendering passes; no provider/generation request or AI quality acceptance. |
+| Reply drafts | Draft history and agency feedback GETs 200; no drafts, zero feedback; Generate draft disabled | Read rendering passes; no generation, review, clipboard or external-message action. |
+| Narrow dialog / keyboard sample | At 759×668, dialog fits the viewport with no dialog/content horizontal overflow; 12 successive Tab steps remain inside; Escape closes | Partial responsive/keyboard evidence only, not complete mobile/screen-reader/WCAG acceptance. |
+| Escape destination | After notification navigation, rendered heading is Leads but URL remains view=Notifications; after Escape, focus is BODY | **PD-04: reproducible live navigation/focus defect.** Production acceptance for this path is open. |
+
+Source correction on developement routes notification Lead and Team destinations through the existing workspace navigation handler, serializes current lead filters, and restores dialog focus to the current workspace when the original trigger has unmounted or cannot accept focus. Existing connected trigger restoration and busy/escape guards are preserved. Six focused focus-target regressions and the existing navigation/notification recovery checks pass together (26/26); these synthetic tests do not mount React or verify the corrected deployed callback. The Team destination correction is source-derived; no invitation/team notice was available for a live journey.
+
+The first full local run passed 812 regressions and backend types, then failed on a pre-existing malformed generated Next dev validator. Only that ignored validator was quarantined. Official Next typegen initially failed from the repository cwd while resolving the relative backend config import, then succeeded from frontend; standalone frontend types passed. The final full verification result is recorded in LOCAL_CHECKS.json and RELEASE_EVIDENCE.md. No compiler exclusion or application configuration was weakened.
+
+**PD-04 remains open on Production until the corrected candidate is deployed and this browser journey is repeated.** The live site still runs main 61f9fe8. The browser route was restored through the normal Leads navigation and left there for handoff. No localhost access workaround, CRM/account/notification write, SQL/configuration change, email, AI/provider call, worker dispatch or deployment occurred in this slice. P8 remains IN PROGRESS / NOT_READY.
+
+Ignored local evidence: backend/.cache/post-deployment/notification-navigation-mismatch.jpg and a minimized matching JSON record of heading, view parameter, focus and viewport. No real contact, factor, row identifier, cookie or raw authenticated response is committed.
+
 ## Access handoff history
 
 The initial in-app Vercel login was completed by the user. The connector's separate 403 alone does not establish which account/connection change would resolve API access. No secret, password, OTP or bypass token is requested in chat. Deployment Protection was preserved; browser authentication was sufficient to inspect the app and its non-secret deployment metadata.
 
-The user completed hosting login, authorized the three-variable setup and Production redeployment, and separately authorized scoped Auth reads, error-log investigation, Dashboard/Leads reads and the named disposable fixture's save/reload/archive check. Further next-work instruction advanced the module reads above. The authenticated read flow and fixture's persisted/archived state are independently observed; the initial fixture create acknowledgement was not captured. The fixture stays archived; current browser handoff is the user's unfinished authenticator setup in Profile. Other existing restrictions and remaining acceptance boundaries are unchanged. Supabase log connector access succeeded; Vercel connector access remains independent of browser login and was not re-tested as if browser login granted API access.
+The user completed hosting login, authorized the three-variable setup and Production redeployment, and separately authorized scoped Auth reads, error-log investigation, Dashboard/Leads reads and the named disposable fixture's save/reload/archive check. Further next-work instruction advanced the module reads above. The authenticated read flow and fixture's persisted/archived state are independently observed; the initial fixture create acknowledgement was not captured. The fixture stays archived; the browser is now on Leads after the additional navigation checks. The user's authenticator setup remains unfinished. Other existing restrictions and remaining acceptance boundaries are unchanged. Supabase log connector access succeeded; Vercel connector access remains independent of browser login and was not re-tested as if browser login granted API access.
 
 ## Functional checks queued after access
 

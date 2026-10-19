@@ -6,6 +6,8 @@ Build/revision evidence: LOCAL_CHECKS.json records actual runtime, timestamp, ch
 
 19 October hosted continuation is recorded separately in POST_DEPLOYMENT_TESTING.md: explicit Production configuration/redeploy, recovered Auth availability, real one-agency OWNER read flow across the current modules, and saved synthetic fixture reload/archive persistence have observed evidence. Initial create acknowledgement, full MFA/invitation/provider/scheduler, multi-agency/role, performance/backup/privacy and complete browser/UAT acceptance remain open. Current reads show unfinished authenticator setup, null seat/AI limits and one pending outbox item at the inspected Operations snapshot. These partial hosted checks do not change the NOT_READY decision or replace the exact local evidence above.
 
+Further 19 October read-only navigation checks found PD-04: opening a current lead from an already-read outdated notice leaves view=Notifications in the URL, and Escape close loses focus to BODY. The source correction and six focus regressions are on developement; Production main 61f9fe8 is unchanged. Keep this gate open until the corrected candidate is deployed and the URL, reload destination and close-focus browser journey pass. AI/draft history reads and a 759×668 / 12-Tab dialog sample pass within their recorded limits; no generation, notification write or factor action was performed.
+
 | Acceptance | Existing local evidence | Remaining hosted/reviewer gate |
 | --- | --- | --- |
 | A01 | database/team tests: unique owner, transactional onboarding, replay | Real verified signup/callback, email, concurrent onboarding |

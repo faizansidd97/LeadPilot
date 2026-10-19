@@ -12,6 +12,7 @@ import { controlSchemas,type ControlAction,type ControlSummary,type AssignmentMe
 import { updateLeadSchema } from '@leadpilot/backend/domain/lead-update';
 import { requestApi,toLead,ApiClientError } from '@/lib/api-client';
 import {ClientRequests,type RequestTicket} from '@/lib/client-workflow';
+import {restoreDialogFocus} from '@/lib/dialog-focus';
 import {LeadSaveRecovery,loadLeadSnapshot,verifyLeadReceipt} from '@/lib/lead-workflow';
 import { allowedTransitions,validateTransition,type Status } from '@leadpilot/backend/domain/leads';
 import { messageSchema } from '@leadpilot/backend/domain/contracts';
@@ -134,7 +135,7 @@ function ScopedLeadDetail({lead,tenantId,timezone,userRole,previewEvents,onEvent
  const ordered=[...messages].sort((a,b)=>Date.parse(b.occurred_at)-Date.parse(a.occurred_at)||Date.parse(b.created_at)-Date.parse(a.created_at)||b.id.localeCompare(a.id));
  const section=sections.find(item=>item.name===tab)!;
  const initials=lead.name.trim().split(/\s+/).slice(0,2).map(part=>part[0]).join('').toUpperCase();
- return <Dialog open onOpenChange={open=>{if(!open)closeLead();}}><DialogContent aria-labelledby="detail-title" showClose={false} className="dialog lead-detail" ref={dialog} onEscapeKeyDown={e=>{if(parentBusy.current||childStateRef.current.busy)e.preventDefault();}} onInteractOutside={e=>e.preventDefault()} onCloseAutoFocus={e=>{e.preventDefault();previousFocus.current?.focus();}}>
+ return <Dialog open onOpenChange={open=>{if(!open)closeLead();}}><DialogContent aria-labelledby="detail-title" showClose={false} className="dialog lead-detail" ref={dialog} onEscapeKeyDown={e=>{if(parentBusy.current||childStateRef.current.busy)e.preventDefault();}} onInteractOutside={e=>e.preventDefault()} onCloseAutoFocus={e=>{e.preventDefault();restoreDialogFocus(previousFocus.current,document.getElementById('workspace-content'));}}>
  <DialogDescription className="sr-only">Review this lead and manage its conversation, facts, tasks and activity.</DialogDescription>
  <div className="lead-detail-header">
   <div className="lead-detail-identity"><span className="lead-detail-avatar" aria-hidden="true">{accessLost?'—':initials}</span><div className="lead-detail-contact"><div className="lead-detail-title"><DialogTitle id="detail-title">{accessLost?'Lead unavailable':lead.name}</DialogTitle>{!accessLost&&<><span className={`status ${lead.status.toLowerCase()}`}>{lead.status.replaceAll('_',' ')}</span>{lead.archived_at&&<span className="lead-detail-flag">Archived</span>}{lead.do_not_contact&&<span className="lead-detail-flag">Do not contact</span>}</>}</div><div className="lead-detail-contact-lines">{!accessLost&&lead.email&&<span><Mail size={14} aria-hidden="true"/>{lead.email}</span>}{!accessLost&&lead.phone&&<span><Phone size={14} aria-hidden="true"/>{lead.phone}</span>}</div></div></div>
