@@ -2,17 +2,17 @@
 
 P8 first through thirtieth hardening slices: locally verified; milestone/release status remains IN PROGRESS / NOT_READY.
 
-Verification recorded 2026-10-11T19:26:29.778Z, v24.19.0; source SHA-256 `5c9cd92c0ae48e8cbb6cacdd16aacbb152c34c3ec83179b0e75db2e63eb80ecc` across 310 source/test/migration/script/config/lock files. Partial user-confirmed persistence and direct worker smoke are recorded below; full hosted/browser/release acceptance remains pending.
+Latest synthetic verification recorded 2026-10-19T08:45:05.930Z on GitHub Actions Ubuntu 24.04, Node v24.21.0: [successful CI run](https://github.com/faizansidd97/LeadPilot/actions/runs/39224768716), revision `5b8a33ae97a39f6e4e5df72f7f48a75f33934152`. Source SHA-256 `f6db0772278fc259ec09d8015a94f336a3fd8da8758b683ff7cc56e10d822081` covers 310 source/test/migration/script/config/lock files and matches the current LF checkout. LOCAL_CHECKS.json is the exact downloaded run artifact, verified against its published ZIP SHA-256. This verifies the pipeline and isolated application checks, not a running hosted application. Preview deployment was skipped pending activation/protected configuration; full hosted/browser/release acceptance remains pending.
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| regression | PASS | 806/806 tests; 645400 ms |
-| backend-types | PASS | Exit 0; 16207 ms |
-| frontend-types | PASS | Exit 0; 20591 ms |
-| analysis-contracts | PASS | Exit 0; 427 ms |
-| draft-contracts | PASS | Exit 0; 528 ms |
-| privacy-inventory | PASS | Exit 0; 6809 ms |
-| production-build | PASS | Exit 0; 27650 ms |
+| regression | PASS | 806/806 tests; 75107 ms |
+| backend-types | PASS | Exit 0; 4473 ms |
+| frontend-types | PASS | Exit 0; 5538 ms |
+| analysis-contracts | PASS | Exit 0; 177 ms |
+| draft-contracts | PASS | Exit 0; 173 ms |
+| privacy-inventory | PASS | Exit 0; 2250 ms |
+| production-build | PASS | Exit 0; 15068 ms |
 
 Account-security presentation correction: confirmed empty factor inventories now show prominent setup onboarding; selector/code entry appears only with an available factor. QR/manual-key instructions, unfinished setup recovery and unavailable/loading states are explicit in Profile and inline Privacy. Existing enrollment preflight, uncertain-outcome fencing and fresh verification remain unchanged. All local checks above pass after this UI change; no new tests were added for presentation alone, and no mounted browser or hosted enrollment acceptance is claimed. SQL stays 001–023. See PRIVACY_RECOVERY.md.
 

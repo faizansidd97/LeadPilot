@@ -6,7 +6,7 @@ The interface is English. Customer inquiries can contain multilingual text; enab
 
 ## Current status
 
-**Development / pre-pilot — updated 12 October 2026.**
+**Development / pre-pilot — updated 19 October 2026.**
 
 | Area | Status |
 | --- | --- |
@@ -24,7 +24,7 @@ Local tests use synthetic data, injected transports and isolated databases with 
 
 See [the product plan and execution tracker](docs/PRODUCT_PLAN.md), [local verification manifest](docs/LOCAL_CHECKS.json) and [release evidence](docs/RELEASE_EVIDENCE.md) for the detailed history and limitations.
 
-The [delivery handoff](docs/DELIVERY_STATUS.md) separates completed local recovery work from remaining policy, staging, acceptance and pilot steps. Separate hosting/domain are not yet available. The next local implementation needs the [privacy execution requirements](docs/PRIVACY_POLICY_REQUIREMENTS.md); the [pilot protocol](docs/PILOT_PROTOCOL.md) is prepared for later baseline, training and weekly review. Irreversible erasure/closure/restore replay remains unimplemented, and release remains NOT_READY.
+The [delivery handoff](docs/DELIVERY_STATUS.md) separates completed local recovery work from remaining policy, staging, acceptance and pilot steps. A Vercel project now exists; the development CI pipeline passes, while protected Preview activation and separate staging acceptance remain pending. The next local implementation needs the [privacy execution requirements](docs/PRIVACY_POLICY_REQUIREMENTS.md); the [pilot protocol](docs/PILOT_PROTOCOL.md) is prepared for later baseline, training and weekly review. Irreversible erasure/closure/restore replay remains unimplemented, and release remains NOT_READY.
 
 ## Product capabilities
 
