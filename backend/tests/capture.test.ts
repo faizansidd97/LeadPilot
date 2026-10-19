@@ -110,7 +110,17 @@ test('P4 database preserves tenant scope, capture/revision provenance, resumable
   await as(owner);const row=(await db.query<any>('select * from public.leads where id=$1',[website.id])).rows[0];assert.equal(row.source,'WEBSITE');assert.equal(row.confirmed_intent,null);assert.equal(row.budget_min,null);assert.equal(row.reported_facts.bedrooms,2);assert.equal(row.assignee_id,member);const msg=(await db.query<any>('select * from public.messages where lead_id=$1',[website.id])).rows[0];assert.equal(msg.channel,'WEBSITE');assert.ok(msg.ingested_at);assert.equal(Date.parse(msg.occurred_at),Date.parse(occurred));await assert.rejects(()=>rpc('revise_message',[a.id,website.id,msg.id,{body:'Forged source',reason:'Change provider text',expected_version:1,expected_lead_version:1},crypto.randomUUID(),crypto.randomUUID()]),/PROVENANCE_IMMUTABLE/);await assert.rejects(()=>rpc('update_lead_facts',[a.id,website.id,{expected_version:1,source_reference:'forged'},crypto.randomUUID(),crypto.randomUUID()]),/PROVENANCE_IMMUTABLE/);const confirmed=await rpc('update_lead_facts',[a.id,website.id,{expected_version:1,confirmed_intent:'RENT',bedrooms:0},crypto.randomUUID(),crypto.randomUUID()]);assert.equal(confirmed.reported_facts.bedrooms,2);assert.equal(confirmed.bedrooms,0);
  });
  await t.test('intake rate denial persists and rotation/revocation invalidate old key versions and replays',async()=>{
-  await worker();for(let i=0;i<60;i++)assert.equal((await rpc('worker_intake_limit',[integration.id,1])).allowed,true);assert.equal((await rpc('worker_intake_limit',[integration.id,1])).allowed,false);assert.equal((await rpc('worker_intake_limit',[integration.id,1])).allowed,false);
+  await worker();
+  // now() stays in one minute even if this fixture crosses a wall-clock boundary.
+  await db.exec('begin');
+  try{
+   for(let i=0;i<60;i++)assert.equal((await rpc('worker_intake_limit',[integration.id,1])).allowed,true);
+   assert.equal((await rpc('worker_intake_limit',[integration.id,1])).allowed,false);
+   assert.equal((await rpc('worker_intake_limit',[integration.id,1])).allowed,false);
+   await db.exec('commit');
+  }catch(error){await db.exec('rollback');throw error;}
+  await db.exec('reset role');
+  assert.equal((await db.query<{count:number}>('select count from private.intake_limits where integration_id=$1',[integration.id])).rows[0].count,61);
   await as(owner);integration=await manage(integration.id,'rotate',{expected_version:1,reason:'Routine key rotation'},crypto.randomUUID(),issueIntakeSecret('rotate:scope','e'.repeat(64)));await worker();await assert.rejects(()=>rpc('worker_ingest_lead',[integration.id,1,'event:1',hash('body:1'),{full_name:'Old key',email:'old@example.com'},null,crypto.randomUUID()]),/INTAKE_UNAVAILABLE/);await assert.rejects(()=>rpc('worker_intake_limit',[integration.id,1]),/INTAKE_UNAVAILABLE/);assert.equal((await rpc('worker_intake_credential',[integration.id])).key_version,2);
   await as(owner);await manage(integration.id,'revoke',{expected_version:2,reason:'Disable website intake'});await worker();assert.equal(await rpc('worker_intake_credential',[integration.id]),null);await assert.rejects(()=>rpc('worker_ingest_lead',[integration.id,2,'event:2',hash('newbody'),{full_name:'Revoked Buyer',email:'revoked@example.com'},null,crypto.randomUUID()]),/INTAKE_UNAVAILABLE/);
  });

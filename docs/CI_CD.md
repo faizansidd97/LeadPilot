@@ -12,6 +12,8 @@ Official actions are pinned to full SHAs resolved from their v6 tags on 19 Octob
 
 Git attributes enforce LF for tracked text on Windows and Linux. The first hosted run passed 806 regressions, both type checks and both contract suites, then exposed an inventory migration checksum saved from mixed Windows line endings. The regenerated inventory binds canonical Git LF migration bytes; reviewed schema fingerprints and SQL content are unchanged. Full hosted verification after that correction is tracked by the Actions run, not inferred from the earlier partial run.
 
+The next run exposed a pre-existing minute-boundary test flake in website intake: 60 separate rate-limit calls could straddle a new minute. The fixture now pins `now()` within one transaction, commits the denial state and verifies the persisted capped count. Runtime rate limiting and migrations are unchanged; the gate is not bypassed or weakened.
+
 ## Protected Preview deployment
 
 After CI passes, a push/manual run on `developement` can deploy to Vercel Preview. PRs, forks and `main` cannot enter this job. It is disabled until repository variable `VERCEL_PREVIEW_DEPLOY_ENABLED` equals `true`.
