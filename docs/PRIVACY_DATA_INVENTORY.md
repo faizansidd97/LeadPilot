@@ -1,6 +1,6 @@
 # Local privacy schema inventory
 
-Catalog coverage: COMPLETE for the reviewed local public/private schema. 39 tables and 1 views. This is catalog metadata only; full data inventory, approved retention and deletion execution remain unavailable. No record values or live credentials are read.
+Catalog coverage: COMPLETE for the reviewed local public/private schema. 47 tables and 1 views. This is catalog metadata only; full data inventory, approved retention and deletion execution remain unavailable. No record values or live credentials are read.
 
 | Relation | Kind | Record class | Scope to review | Foreign keys | Opaque fields |
 | --- | --- | --- | --- | ---: | --- |
@@ -27,6 +27,14 @@ Catalog coverage: COMPLETE for the reviewed local public/private schema. 39 tabl
 | private.lead_import_rows | Table | Import content and progress | Tenant; rows may have no saved lead yet | 2 | payload, errors |
 | private.lead_imports | Table | Import content and progress | Tenant; rows may have no saved lead yet | 2 | None |
 | private.outbox_events | Table | Private worker payload and replay | Tenant plus opaque entity/operation/payload links | 1 | payload |
+| private.privacy_context | Table | Privacy execution and restore evidence | Private policy, scope tombstones and independently retained replay evidence | 0 | None |
+| private.privacy_history | Table | Privacy execution and restore evidence | Private policy, scope tombstones and independently retained replay evidence | 1 | summary |
+| private.privacy_intake_barriers | Table | Privacy execution and restore evidence | Private policy, scope tombstones and independently retained replay evidence | 0 | None |
+| private.privacy_jobs | Table | Privacy execution and restore evidence | Private policy, scope tombstones and independently retained replay evidence | 3 | None |
+| private.privacy_policy | Table | Privacy execution and restore evidence | Private policy, scope tombstones and independently retained replay evidence | 0 | None |
+| private.privacy_restore_gate | Table | Privacy execution and restore evidence | Private policy, scope tombstones and independently retained replay evidence | 0 | None |
+| private.privacy_restore_receipts | Table | Privacy execution and restore evidence | Private policy, scope tombstones and independently retained replay evidence | 0 | None |
+| private.privacy_subjects | Table | Privacy execution and restore evidence | Private policy, scope tombstones and independently retained replay evidence | 2 | None |
 | private.request_limits | Table | Shared actor limits | Cross-tenant Auth actor | 1 | None |
 | private.website_integrations | Table | Website intake and encrypted credentials | Tenant or integration parent | 3 | None |
 | public.activity_events | Table | Audit and privacy review evidence | Tenant; some events have no lead reference | 3 | details |
@@ -70,6 +78,14 @@ Catalog coverage: COMPLETE for the reviewed local public/private schema. 39 tabl
 - private.lead_import_rows: Review pending/invalid/duplicate payloads and errors; lead_id alone does not find all matching inquiry content.
 - private.lead_imports: Review pending/invalid/duplicate payloads and errors; lead_id alone does not find all matching inquiry content.
 - private.outbox_events: Inspect indirect/JSON references and late jobs; do not delete an entire tenant queue for one lead.
+- private.privacy_context: No customer text; preserve immutable manifest scope and replay barriers separately from anonymous summary expiry. Verify complete independent exports and offline restore gate before release.
+- private.privacy_history: No customer text; preserve immutable manifest scope and replay barriers separately from anonymous summary expiry. Verify complete independent exports and offline restore gate before release.
+- private.privacy_intake_barriers: No customer text; preserve immutable manifest scope and replay barriers separately from anonymous summary expiry. Verify complete independent exports and offline restore gate before release.
+- private.privacy_jobs: No customer text; preserve immutable manifest scope and replay barriers separately from anonymous summary expiry. Verify complete independent exports and offline restore gate before release.
+- private.privacy_policy: No customer text; preserve immutable manifest scope and replay barriers separately from anonymous summary expiry. Verify complete independent exports and offline restore gate before release.
+- private.privacy_restore_gate: No customer text; preserve immutable manifest scope and replay barriers separately from anonymous summary expiry. Verify complete independent exports and offline restore gate before release.
+- private.privacy_restore_receipts: No customer text; preserve immutable manifest scope and replay barriers separately from anonymous summary expiry. Verify complete independent exports and offline restore gate before release.
+- private.privacy_subjects: No customer text; preserve immutable manifest scope and replay barriers separately from anonymous summary expiry. Verify complete independent exports and offline restore gate before release.
 - private.request_limits: Do not remove another agency's actor state or Auth account through one agency closure.
 - private.website_integrations: Review captured event provenance, revoke access as approved and preserve required backup/key dependencies.
 - public.activity_events: Review reasons/details/verification references and minimized justified evidence; no blanket audit exemption.

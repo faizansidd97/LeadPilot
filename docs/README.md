@@ -1,5 +1,7 @@
 # LeadPilot AI
 
+Anonymization implementation and operator setup: [PRIVACY_EXECUTION.md](PRIVACY_EXECUTION.md). Migration 024 and worker/restore tooling are locally verified; execution is disabled until separately configured and accepted in staging.
+
 
 
 Development baseline: LP BRD 001 and LP FSD 001, version 1.0, 5 October 2026, in `docs/`.

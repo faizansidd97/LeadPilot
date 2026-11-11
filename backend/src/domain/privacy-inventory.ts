@@ -23,6 +23,7 @@ const classes:Record<string,Class>={
  platform:{category:'Platform policy',scope:'Shared platform configuration',review:'Shared configuration is not a tenant deletion target; review operational retention separately.'},
  key:{category:'Signing/encryption issuance and operation evidence',scope:'Tenant issuance or opaque global operation',review:'Review original receipts/operator references and historical key/backup dependencies; never infer a safe key retirement.'},
  derived:{category:'Derived scanner view',scope:'Derived tenant/lead/task/recipient rows',review:'No stored view rows to purge; verify underlying records and processing fences.'}
+ ,privacy:{category:'Privacy execution and restore evidence',scope:'Private policy, scope tombstones and independently retained replay evidence',review:'No customer text; preserve immutable manifest scope and replay barriers separately from anonymous summary expiry. Verify complete independent exports and offline restore gate before release.'}
 };
 const groups:Record<string,string[]>={
  workspace:['public.leads','public.messages','public.message_revisions','public.follow_ups','public.notifications'],
@@ -31,7 +32,8 @@ const groups:Record<string,string[]>={
  import:['private.lead_imports','private.lead_import_rows'],intake:['private.website_integrations','private.intake_events','private.intake_limits'],
  queue:['private.api_requests','private.outbox_events'],usage:['private.ai_usage_windows'],actor:['private.ai_submission_limits','private.request_limits'],
  platform:['private.ai_policy','private.ai_policy_events','private.draft_policy','private.intake_encryption_policy','private.intake_signing_policy','private.invitation_signing_policy'],
- key:['private.intake_encryption_operations','private.intake_signing_issuances','private.intake_signing_operations','private.invitation_issuances','private.invitation_signing_operations'],derived:['private.due_candidates']
+ key:['private.intake_encryption_operations','private.intake_signing_issuances','private.intake_signing_operations','private.invitation_issuances','private.invitation_signing_operations'],derived:['private.due_candidates'],
+ privacy:['private.privacy_policy','private.privacy_jobs','private.privacy_subjects','private.privacy_history','private.privacy_context','private.privacy_intake_barriers','private.privacy_restore_gate','private.privacy_restore_receipts']
 };
 export const privacyRelationReview:Readonly<Record<string,Class>>=Object.freeze(Object.fromEntries(Object.entries(groups).flatMap(([key,names])=>names.map(name=>[name,Object.freeze({...classes[key]})]))));
 export const privacyExternalInventory=[

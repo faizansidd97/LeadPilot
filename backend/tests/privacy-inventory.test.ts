@@ -11,10 +11,10 @@ let db:Awaited<ReturnType<typeof localDatabase>>,catalog:PrivacyCatalog;
 before(async()=>{db=await localDatabase();catalog=await readLocalPrivacyCatalog(db);});after(async()=>{await db?.close();});
 const copy=()=>structuredClone(catalog),get=(rows:PrivacyCatalog,name:string)=>rows.find(r=>r.name===name)!;
 test('Reviewed current local schema covers every public/private relation without granting full inventory, policy or execution',()=>{
- const report=buildPrivacyInventory(catalog);assert.equal(report.coverage.tables,39);assert.equal(report.coverage.views,1);assert.equal(report.catalog_coverage_complete,true);
+ const report=buildPrivacyInventory(catalog);assert.equal(report.coverage.tables,47);assert.equal(report.coverage.views,1);assert.equal(report.catalog_coverage_complete,true);
  assert.deepEqual(report.coverage.missing,[]);assert.deepEqual(report.coverage.unclassified,[]);assert.deepEqual(report.coverage.changed,[]);
  for(const key of ['inventory_complete','retention_policy_approved','execution_available'] as const)assert.equal(report[key],false);
- assert.equal(Object.keys(privacyRelationReview).length,40);assert.equal(Object.keys(privacyReviewedSchema).length,40);assert.ok(report.external_dependencies.every(d=>d.status==='NOT_INSPECTED'));
+ assert.equal(Object.keys(privacyRelationReview).length,48);assert.equal(Object.keys(privacyReviewedSchema).length,48);assert.ok(report.external_dependencies.every(d=>d.status==='NOT_INSPECTED'));
 });
 test('Inventory records composite foreign keys, cycles, key delete actions and derived scanner dependencies without a deletion order',()=>{
  const lead=get(catalog,'public.leads'),analysis=get(catalog,'public.ai_analyses'),jobs=get(catalog,'public.ai_jobs');

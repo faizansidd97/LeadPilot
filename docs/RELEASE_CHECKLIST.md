@@ -2,6 +2,8 @@
 
 P8 is **IN PROGRESS**. P0–P7 local implementation is preserved; P8's locally verified hardening/rotation slices do not grant hosted verification or release acceptance. P9 starts after release/partner/data boundaries are resolved, not because code exists.
 
+12 November local anonymization completion: migration 024/API/UI/worker and independent signed-manifest restore replay are implemented and default-disabled. The 24 new tests include real isolated data cleanup, scope/role/MFA/holds, rollback, expiry, leases and actual older dump/load. Independent storage durability/completeness, external-copy/region/backup review, hosted migration/MFA/concurrency/browser and deployed worker acceptance still gate enablement/release. No live execution occurred. See PRIVACY_EXECUTION.md.
+
 19 October application recovery slice: route/root-layout render boundaries and a missing-page view are implemented with fixed safe copy, explicit framework retry, canonical workspace navigation and uncertain-save guidance. APP_RECOVERY.md records scope and limits. Keep A24 mounted exception/retry, root-layout/CSP/style delivery, responsive/keyboard/screen-reader and hosted acceptance open; no browser injection or Production deployment is implied by compiler/regression checks.
 
 19 October MFA follow-up: user reports verification complete; two fresh stable-origin inventory GETs still show one unverified factor and recent false in the testing session, matching Setup unfinished. URL/outcome reconciliation is pending. This is not accepted MFA/A05 evidence and does not authorize agent factor reset/enrollment/verification. See POST_DEPLOYMENT_TESTING.md; the approved navigation correction remains deployed and passed.
@@ -35,7 +37,7 @@ Further 19 October read-only navigation checks found PD-04: opening a current le
 | A19 | dashboard tests: calendar/DST/outcomes/contact denominator/list parity | Real agency dates, browser filters/drilldowns and concurrent changes |
 | A20 | team/notifications/AI/draft tests: immediate revocation, retained attribution | Concurrent hosted offboarding/large workloads and signed sessions |
 | A21 | Mutation tests: immutable scope, current-authority replay and forced-audit rollback | Hosted audit permissions, support/log retention and review export policy |
-| A22 | Privacy intake/review/hold, manager impact preview, MFA, notes, permissions/read-only and rollback; offline local schema inventory/drift check (39 tables/one view, no execution authority) | Approved policy; child/job/usage erasure/closure; justified audit; restored deletion replay — **unimplemented** |
+| A22 | Intake/review/hold plus local 024 scoped anonymization/closure, private-copy/replay fences, expiry, immutable manifest acknowledgement and older-backup replay; 47-table/one-view catalog drift checks | Independent storage/complete export and key retention, external-copy review, hosted migration/MFA/concurrency/browser/worker and operator restore acceptance — **pending** |
 | A23 | Actual isolated dump/load/lease/migration rollback tests; measured 10k sequential SQL fixture | 50 real concurrent users, HTTP/UI/AI timings, outage/backup tier RPO/RTO — **pending** |
 | A24 | Responsive/focus/reduced-motion/source UI and deferred client recovery helpers plus compile/build evidence | Permitted desktop/mobile/tablet/keyboard/screen-reader/Auth/dialog/error/UAT — **pending** |
 

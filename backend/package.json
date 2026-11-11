@@ -29,6 +29,8 @@
     "check:release": "node scripts/check-release.mjs",
     "inventory:privacy": "node --experimental-strip-types scripts/privacy-inventory.mjs",
     "check:privacy-inventory": "node --experimental-strip-types scripts/privacy-inventory.mjs --check",
+    "worker:privacy": "node --experimental-strip-types scripts/privacy-operator.mjs --run-worker",
+    "restore:privacy": "node --experimental-strip-types scripts/privacy-operator.mjs --restore",
     "check:health": "node --experimental-strip-types scripts/check-platform-health.mjs",
     "inspect:ai-attempts": "node --experimental-strip-types scripts/inspect-ai-attempts.mjs",
     "rotate:intake-encryption": "node --experimental-strip-types scripts/rotate-intake-encryption.mjs",

@@ -1,8 +1,10 @@
 # Local and development verification evidence
 
-P8 first through thirtieth hardening slices, the navigation source correction and application recovery UI: locally verified; milestone/release status remains IN PROGRESS / NOT_READY.
+P8 hardening, navigation/application recovery and local anonymization/closure/restore replay: locally verified; milestone/release status remains IN PROGRESS / NOT_READY.
 
-Latest synthetic verification recorded 2026-10-19T12:08:48.977Z on the local Windows workspace, Node v24.19.0. Source SHA-256 `8ec4b84802d3106966395f005aff770f40746f7e76d1beb3ba9873f5d31c1a9f` covers 317 source/test/migration/script/config/lock files. LOCAL_CHECKS.json is the generated result of the complete passing verifier run, not a CI artifact or human sign-off. It verifies isolated application checks and compilation. Application recovery is not yet deployed or browser-accepted; the earlier hosted navigation retest below applies only to Production 5da28cd.
+Latest synthetic verification recorded **12 November 2026, 00:52 Asia/Karachi** (2026-11-11T19:52:38.928Z) on the local Windows workspace, Node v24.22.1. Source SHA-256 `ef92e220f28b51d0b92c7a0a4a5f75a0c70a224fb0c052557160cf75c1c9cd3d` covers 330 source/test/migration/script/config/lock files. LOCAL_CHECKS.json is the generated complete passing run, not a CI artifact or human sign-off. It verifies isolated application/SQL checks and compilation. Anonymization and application recovery are not deployed or browser-accepted; the historical hosted navigation retest below applies only to Production 5da28cd.
+
+Anonymization completion adds **24 tests**: ten actual isolated SQL tests, ten injected manifest/worker/restore tests and four client recovery tests. Migration 024 enforces owner/recent MFA/current versions/holds, prepared/terminal scope fencing, removal of linked public/private content, 30-day summary expiry, bounded 25-subject lease batches and scoped closure preserving other agencies/shared Auth. Independent HMAC manifests must be conditionally saved and read back before cleanup. Restore verifies an independent signed export and its out-of-band digest, blocks identity/RLS, replays even intents absent from an older actual dump, and leaves the gate blocked until explicit reviewed finish. Cases cover denied roles/MFA/holds/imports/uncertain processing, content cleanup/unchanged unrelated receipts, late writes and website replay, cleanup/migration rollback, 26-subject batching, expiry and actual dump/load. Initial draft fixture and restore qualifier failures were corrected; complete reruns pass. Reviewed inventory binds 47 tables/one view and all 24 migrations. The SQL-only setup bundler avoids touching environment configuration. No live API/customer/worker/provider/credential/SQL/deployment action occurred. See PRIVACY_EXECUTION.md for retained technical tombstones, external-copy boundaries and storage/scheduler/operator prerequisites. A22 and release acceptance remain pending.
 
 Application recovery continuation: implemented installed Next.js route and root-layout error boundaries plus a missing-page view. The shared standalone CSS-module view focuses its heading, wraps controls at narrow widths, uses fixed canonical workspace links, and offers only an explicit framework render/refetch retry. It never reads/displays/logs the caught exception or failed URL, nor automatically submits a business mutation. The save-outcome warning explicitly tells users to inspect current records before resubmitting and allows for lost unsaved input. Existing expected-error/replay handlers are unchanged. React review confirms stable hooks, no network effects/extra package imports and independent root-error document/style dependencies. No tests were added for presentation alone; the existing 812 regressions remain green and both type checks/contracts/privacy inventory/production build pass. Mounted error injection/retry/CSP/focus/screen-reader/responsive and hosted acceptance remain pending. No SQL/key/environment/provider/worker/account/MFA or deployment action occurred. See APP_RECOVERY.md.
 
@@ -12,13 +14,13 @@ Current Production correction: after user approval, main fast-forwarded to **5da
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| regression | PASS | 812/812 tests; 152499 ms |
-| backend-types | PASS | Exit 0; 11316 ms |
-| frontend-types | PASS | Exit 0; 3665 ms |
-| analysis-contracts | PASS | 100 constructed contracts; 616 ms |
-| draft-contracts | PASS | 56 constructed contracts; 532 ms |
-| privacy-inventory | PASS | Exit 0; 5739 ms |
-| production-build | PASS | Exit 0; 25498 ms |
+| regression | PASS | 836/836 tests; 76640 ms |
+| backend-types | PASS | Exit 0; 3854 ms |
+| frontend-types | PASS | Exit 0; 4550 ms |
+| analysis-contracts | PASS | 100 constructed contracts; 241 ms |
+| draft-contracts | PASS | 56 constructed contracts; 206 ms |
+| privacy-inventory | PASS | Exit 0; 2458 ms |
+| production-build | PASS | Exit 0; 12505 ms |
 
 Initial PD-04 finding on main 61f9fe8: read-only opening of an already-read outdated notification loaded the current lead but left view=Notifications in the URL and Escape returned focus to BODY. The source correction uses shared navigation for Lead/Team destinations and restores a connected original trigger or current-workspace fallback. Six focus-target tests cover mounted, detached, missing, body and non-focusable targets; the focused navigation/notification/focus set passes 26/26. The React checklist found no new hook ordering, fetch waterfall, subscription or server/client boundary change; the direct helper import has no browser-global module initialization. Those tests do not mount React; the subsequent approved deployment and independent browser retest above resolve the specific lead path. The initial 759×668 / 12-Tab sample remains partial keyboard/layout evidence. No factor, notification, CRM, provider, worker or deployment write occurred in that initial finding slice. See POST_DEPLOYMENT_TESTING.md.
 

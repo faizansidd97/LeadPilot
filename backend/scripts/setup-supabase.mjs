@@ -27,6 +27,10 @@ async function prepare() {
   for(const name of ['SUPABASE_SERVICE_ROLE_KEY','INVITATION_MAIL_URL','INVITATION_MAIL_TOKEN','INTAKE_ENCRYPTION_KEY','OPENAI_API_KEY','OPENAI_ANALYSIS_MODEL','AI_PLATFORM_ENABLED','AI_PROCESSING_APPROVED','AI_RUBRIC_APPROVED','AI_APPROVED_LANGUAGES','AI_DRAFTS_ENABLED','OPERATIONAL_LOGS_ENABLED','INTAKE_ENCRYPTION_KEYS','INVITATION_TOKEN_KEYS','INTAKE_SIGNING_ROOT_KEYS'])if(!(name in parseEnv(completeEnv)))completeEnv=completeEnv.trimEnd()+'\n'+name+'=\n';
   if(!parseEnv(completeEnv).INTAKE_ENCRYPTION_KEY){const value=randomBytes(32).toString('hex');completeEnv=/^INTAKE_ENCRYPTION_KEY=.*$/m.test(completeEnv)?completeEnv.replace(/^INTAKE_ENCRYPTION_KEY=.*$/m,'INTAKE_ENCRYPTION_KEY='+value):completeEnv.trimEnd()+'\nINTAKE_ENCRYPTION_KEY='+value+'\n';}
   await writeFile(envPath,completeEnv);
+  await bundleSql();
+  console.log('frontend/.env.local is ready; existing values were preserved.');
+}
+async function bundleSql(){
   const files = (await readdir(migrationDir)).filter(name => /^\d+_.+\.sql$/.test(name)).sort();
   if (!files.length) throw new Error('No migration sources found.');
   const pieces = [];
@@ -41,7 +45,6 @@ async function prepare() {
   const sql = `-- Generated from versioned migrations. Regenerate with pnpm setup:supabase.\n-- Apply once to a development project without existing LeadPilot tables.\n-- All schema changes commit together; existing LeadPilot tables stop setup.\nbegin;\n${guard}\n\n${pieces.join('\n\n')}\n\ncommit;\n`;
   await writeFile(outputPath, sql);
   console.log(`Prepared ${files.length} migrations as backend/supabase/setup.sql.`);
-  console.log('frontend/.env.local is ready; existing values were preserved.');
   console.log('No remote connection or database change has been performed.');
 }
 
@@ -97,7 +100,8 @@ async function check() {
 }
 
 try {
-  if(process.argv.includes('--check')) process.exitCode=(await check())?0:1;
+  if(process.argv.length===3&&process.argv[2]==='--sql-only')await bundleSql();
+  else if(process.argv.includes('--check')) process.exitCode=(await check())?0:1;
   else await prepare();
 } catch {
   console.error('Supabase setup could not complete. Check local file access and migration transaction framing.');

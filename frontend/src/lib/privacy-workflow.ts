@@ -1,4 +1,5 @@
 import {privacyRequestSchema,privacyActionSchema,type PrivacyCase} from '@leadpilot/backend/domain/privacy';
+import {privacyStates} from '../../../backend/src/domain/privacy-execution.ts';
 import type {RequestTicket} from './client-workflow.ts';
 import {LeadSaveRecovery} from './lead-workflow.ts';
 
@@ -19,7 +20,7 @@ function invalid(message='Privacy records could not be verified. Refresh to try 
 function rows(page:any,key:string,next:any){if(!record(page)||!Array.isArray(page[key])||page[key].length>25||!cursor(next)||page[key].some((row:any)=>!record(row)||!uuid(row.id))||new Set(page[key].map((row:any)=>row.id)).size!==page[key].length)invalid();}
 function verifyCase(row:any,tenant:string):PrivacyCase{
  if(!record(row)||!uuid(row.id)||row.tenant_id!==tenant||!['LEAD_ERASURE','AGENCY_CLOSURE'].includes(row.kind)||
-  !['REQUESTED','IN_REVIEW','ON_HOLD','WITHDRAWN'].includes(row.state)||!version(row.version)||!text(row.reason,500,5)||
+  !privacyStates.includes(row.state)||!version(row.version)||!text(row.reason,500,5)||
   !date(row.created_at)||!date(row.updated_at)||(row.kind==='LEAD_ERASURE'?!uuid(row.lead_id):row.lead_id!==null)||
   !(row.verification_reference===null||text(row.verification_reference,200,5))||
   (row.state==='ON_HOLD'?!text(row.hold_reason,500,5):row.hold_reason!==null))invalid();

@@ -1,6 +1,6 @@
 # Privacy execution requirements
 
-This worksheet makes the remaining A22 implementation dependency concrete. It records requirements to decide; it is not an approved legal policy or a deletion authorization. Current Privacy supports request intake, identity-reference review, holds/history and a partial impact preview. It cannot erase leads, close agencies or replay deletions after restore.
+12 November 2026 implementation update: the user-approved identifying-content removal, 30-day summary and expiry behavior is now implemented locally in migration 024, API/UI, bounded worker and independent-manifest restore replay. It stays disabled pending operator configuration and staging acceptance. No live execution is authorized by this document. See PRIVACY_EXECUTION.md for field treatment, protected tombstones and remaining external/hosting/reviewer requirements. Earlier implementation-pending statements below are historical where superseded by this approval and implementation record.
 
 12 October 2026 latest user decisions: retain anonymous history instead of permanently deleting records; keep that history for 30 days starting from anonymization; take daily backups and retain them for 7 days. The user also accepted the proposed requirement to reapply anonymization when restoring an older backup so customer identities do not return. These decisions supersede the earlier undecided mode/duration/frequency answers. Exact field treatment, expiry behavior, backup implementation and the remaining decisions below are still unresolved. These product settings do not enable execution or establish a complete implemented policy.
 
@@ -10,15 +10,17 @@ The project owner and appropriate privacy reviewer must provide the remaining da
 
 ## Confirmed product settings
 
+19 October 2026 additional user approval (development behavior only): remove customer identity and identifying free text from messages, notes, AI results and imports; retain only non-identifying history for 30 days, then expire that history and keep a completion record without customer details. This resolves the earlier day-30 outcome and identifying-content treatment choices for implementation. It does not authorize live execution or claim external copies/backups have been removed. Shared Auth accounts, uncertain external work, legal/review holds, independent restore manifests and provider/hosting setup still need enforced boundaries and actual acceptance.
+
 | Setting | User decision on 12 October 2026 |
 | --- | --- |
 | Deletion mode | Anonymize identifying data and retain anonymous history rather than permanently deleting the record. |
-| Anonymous history window | 30 days from anonymization; exact expiry outcome and treatment of audit/completion/restore evidence still require definition. |
+| Anonymous history window | 30 days from anonymization; identifying content is removed, aggregate history expires after 30 days and only minimal completion/restore evidence remains (additional user approval 19 October). |
 | Backup frequency | Daily; exact schedule/timezone, monitoring and operator ownership remain to be configured. |
 | Backup retention | 7 days; actual provider/tier, copied backups and expiry verification remain to be configured. |
 | Restore requirement | Reapply anonymization before serving restored records; design a protected manifest independent of the restored backup and test replay. |
 
-These are recorded decisions only. No backup job, provider configuration, data anonymization or expiry automation has been created. Supabase's managed daily backups and retention depend on the selected plan; Free projects require their own export/backup setup. Database backups do not include Storage objects, which require separate inventory and coverage if used. See [Supabase database backup documentation](https://supabase.com/docs/guides/platform/backups).
+The local implementation follows these decisions; no real backup job, provider configuration or hosted anonymization/expiry scheduling was created. Supabase's managed daily backups and retention depend on the selected plan; Free projects require their own export/backup setup. Database backups do not include Storage objects, which require separate inventory and coverage if used. See [Supabase database backup documentation](https://supabase.com/docs/guides/platform/backups).
 
 | Required decision | Value / evidence still needed |
 | --- | --- |
@@ -46,4 +48,4 @@ Local preparation now includes PRIVACY_DATA_INVENTORY.md and its JSON companion.
 5. Exercise synthetic actual SQL audit rollback, scope/role/hold/overlap, child relationships, idempotent replay, delayed worker/reply, shared-user closure and partial failure. Restore an actual isolated backup, replay the manifest before serving records, and prove erased data cannot reappear.
 6. Verify those operations in approved staging with the purchased backup tier, documented operator procedure and reviewer sign-off. Only then expose the execution UI and accept A22.
 
-The exact migration, executor and storage protocol depend on the decisions above. They are still unimplemented. Policy preparation can proceed locally; execution approval must refer to the concrete tested implementation. See PRIVACY_IMPACT.md, PRIVACY_RECOVERY.md, RUNBOOKS.md and RELEASE_CHECKLIST.md.
+Migration 024, the executor and HTTP manifest-store/restore protocol are now implemented locally as specified in PRIVACY_EXECUTION.md. Remaining policy/region/external retention decisions gate live activation, rather than the existence of this development implementation. Execution approval must refer to the concrete staged candidate and independently verified storage/restore setup. See PRIVACY_IMPACT.md, PRIVACY_RECOVERY.md, RUNBOOKS.md and RELEASE_CHECKLIST.md.
