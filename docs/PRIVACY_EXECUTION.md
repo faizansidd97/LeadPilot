@@ -1,5 +1,7 @@
 # Anonymization and restore replay
 
+13 November setup addition: a deployable private Cloudflare R2 adapter and disabled-by-default one-minute scheduler are now prepared. Follow [PRIVACY_CLOUD_SETUP.md](PRIVACY_CLOUD_SETUP.md) for migration preflight, storage lock/retention, secrets and deployment. The original implementation evidence below is historical; hosted resources, migration and execution have not been activated by this addition.
+
 Implemented locally on 12 November 2026, completing migration 024 started on 19 October. The user approved identifying-content removal, 30-day non-identifying history, then expiry to a minimal completion record. No live anonymization, hosted migration, worker tick, credential change or deployment was performed.
 
 ## User and worker flow

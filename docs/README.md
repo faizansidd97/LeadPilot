@@ -2,6 +2,8 @@
 
 Anonymization implementation and operator setup: [PRIVACY_EXECUTION.md](PRIVACY_EXECUTION.md). Migration 024 and worker/restore tooling are locally verified; execution is disabled until separately configured and accepted in staging.
 
+Private Cloudflare R2 adapter, gated one-minute scheduler and exact migration/deployment steps: [PRIVACY_CLOUD_SETUP.md](PRIVACY_CLOUD_SETUP.md). Cloud resources and execution remain unactivated until verified account access and operator prerequisites are complete.
+
 
 
 Development baseline: LP BRD 001 and LP FSD 001, version 1.0, 5 October 2026, in `docs/`.

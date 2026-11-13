@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-11T19:52:38.928Z",
+  "generated_at": "2026-11-13T06:47:59.491Z",
   "node": "v24.22.1",
   "source": {
-    "sha256": "ef92e220f28b51d0b92c7a0a4a5f75a0c70a224fb0c052557160cf75c1c9cd3d",
-    "files": 330
+    "sha256": "413f2bcf88b2c46d0900be39f809fc77da66d8083f9b76f651348925a5cbc2f8",
+    "files": 334
   },
   "status": "PASS",
   "checks": [
@@ -11,45 +11,45 @@
       "name": "regression",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 76640,
-      "tests": 836,
-      "passed": 836
+      "duration_ms": 127330,
+      "tests": 846,
+      "passed": 846
     },
     {
       "name": "backend-types",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 3854
+      "duration_ms": 6855
     },
     {
       "name": "frontend-types",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 4550
+      "duration_ms": 2436
     },
     {
       "name": "analysis-contracts",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 241
+      "duration_ms": 268
     },
     {
       "name": "draft-contracts",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 206
+      "duration_ms": 219
     },
     {
       "name": "privacy-inventory",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 2458
+      "duration_ms": 2838
     },
     {
       "name": "production-build",
       "status": "PASS",
       "exit_code": 0,
-      "duration_ms": 12505
+      "duration_ms": 14357
     }
   ],
   "scope": "Local synthetic/emulated Auth/database and compiler evidence only",

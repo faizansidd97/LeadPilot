@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/wrangler@4.160.1/config-schema.json",
+  "name": "leadpilot-privacy-manifests",
+  "main": "../src/infrastructure/privacy-manifest-store.ts",
+  "compatibility_date": "2026-11-12",
+  "workers_dev": true,
+  "preview_urls": false,
+  "r2_buckets": [
+    { "binding": "MANIFESTS", "bucket_name": "leadpilot-privacy-manifests" }
+  ],
+  "triggers": { "crons": ["* * * * *"] },
+  "vars": {
+    "MANIFEST_WRITES_ENABLED": "false",
+    "PRIVACY_SCHEDULER_ENABLED": "false",
+    "PRIVACY_APP_ORIGIN": "https://lead-pilot-five.vercel.app"
+  },
+  "observability": { "enabled": false }
+}

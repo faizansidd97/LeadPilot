@@ -1,5 +1,7 @@
 # Delivery status and remaining work
 
+13 November infrastructure continuation: a dedicated private Cloudflare R2 Worker adapter and gated one-minute privacy scheduler are prepared in backend/manifest-store and backend/src/infrastructure. Signed/size/scope checks, immutable conditional writes, safe lock-race handling and strict scheduled worker acknowledgements are covered by ten new focused tests; actual Wrangler bundling passes locally. PRIVACY_CLOUD_SETUP.md contains the exact migration-024 preflight, private storage/lock/key requirements and deployment sequence. Cloudflare OAuth is confirmed for the user-selected personal account; R2 activation is still unverified (API 10042), and Supabase/Vercel access remains unavailable; no live migration, bucket, deployment, active scheduler or customer cleanup is claimed. Flags stay disabled. Current complete local evidence is generated in LOCAL_CHECKS.json.
+
 Reviewed on 12 November 2026. The anonymization development requested by the user is implemented locally on developement; activation, deployment and hosted acceptance remain separate. Earlier Production and CI observations below retain their original dates. This report does not accept a release.
 
 ## Implemented locally
@@ -12,7 +14,7 @@ P0–P7 implementation is preserved: authenticated agencies/team/MFA, leads and 
 
 The final client recovery pass includes Settings profile/team/invitation/agency/pilot/owner transfer and Operations/owner AI usage. Original uncertain Settings saves keep their original payload/key; acknowledged writes recover with reads only. Private links require current matching invitation state. Queue and usage refreshes hide unverified counts and fence duplicate/late reads. See SETTINGS_RECOVERY.md and OPERATIONS_RECOVERY.md.
 
-Latest complete local verification passes **836/836 tests**, both package types, 100 analysis/56 draft constructed contracts, saved privacy inventory and production build. Generated LOCAL_CHECKS.json and RELEASE_EVIDENCE.md bind exact runtime/source evidence. The reviewed catalog now covers 47 tables and one view. Schema is 001–024; port remains 4000. New private manifest-store/signing configuration is optional while anonymization is disabled and mandatory before enabling it. No real provider quality or hosted/browser sign-off is implied; the dependency advisory report remains a separate dated observation.
+Latest complete local verification passes **846/846 tests**, both package types, 100 analysis/56 draft constructed contracts, saved privacy inventory and production build. Generated LOCAL_CHECKS.json and RELEASE_EVIDENCE.md bind exact runtime/source evidence. The reviewed catalog now covers 47 tables and one view. Schema is 001–024; port remains 4000. New private manifest-store/signing configuration is optional while anonymization is disabled and mandatory before enabling it. No real provider quality or hosted/browser sign-off is implied; the dependency advisory report remains a separate dated observation.
 
 ## CI/CD continuation (19 October 2026)
 

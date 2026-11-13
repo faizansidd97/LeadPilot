@@ -1,0 +1,5 @@
+# Worker secrets: use Wrangler secret bulk with a protected local JSON file.
+# Same token/key ring as the application. Never NEXT_PUBLIC_ variables.
+PRIVACY_MANIFEST_STORE_TOKEN=
+PRIVACY_MANIFEST_KEYS=
+CRON_SECRET=
